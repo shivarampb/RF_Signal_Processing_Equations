@@ -302,7 +302,8 @@ function ofdmChain(slide, box) {
   const rx = ['RF + ADC', 'Remove\nprefix', 'FFT', 'Equalise\n(1 tap/bin)', 'QAM\ndecisions'];
   const gap = 0.3;
   const bw = (box.w - gap * 4) / 5;
-  const bh = 0.55;
+  const rowGap = 0.35;
+  const bh = Math.min(0.55, (box.h - rowGap) / 2);
   const draw = (names, y, hlIndex, tag) => {
     label(slide, tag, box.x - 0.55, y, 0.5, bh, { fontSize: 10, bold: true, color: C.navy, align: 'right' });
     names.forEach((nm, i) => {
@@ -313,11 +314,11 @@ function ofdmChain(slide, box) {
     });
   };
   draw(tx, box.y, 2, 'TX');
-  draw(rx, box.y + bh + 0.55, 2, 'RX');
+  draw(rx, box.y + bh + rowGap, 2, 'RX');
   // channel arrow between
   const xm = box.x + box.w - bw / 2;
-  line(slide, xm, box.y + bh, xm, box.y + bh + 0.55, { arrow: true, dash: 'dash', color: C.coral, width: 1.25 });
-  label(slide, 'multipath channel', xm - 1.3, box.y + bh + 0.12, 1.2, 0.3, { fontSize: 9, color: C.coral, italic: true, align: 'right' });
+  line(slide, xm, box.y + bh, xm, box.y + bh + rowGap, { arrow: true, dash: 'dash', color: C.coral, width: 1.25 });
+  label(slide, 'radio channel', xm - 1.3, box.y + bh + rowGap / 2 - 0.12, 1.2, 0.25, { fontSize: 9, color: C.coral, italic: true, align: 'right' });
 }
 
 module.exports = { block, line, label, dot, rfChain, adcBlocks, sampleHold, flashAdc, butterfly, fft8, ofdmChain, CHAIN };

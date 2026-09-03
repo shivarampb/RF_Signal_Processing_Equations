@@ -293,6 +293,110 @@ function expertCorner(slide, text, box) {
   );
 }
 
+/** Everyday analogy: teal-tinted card with a "Think of it like this" label. */
+function analogyCard(slide, text, box, opts = {}) {
+  slide.addShape('roundRect', {
+    x: box.x,
+    y: box.y,
+    w: box.w,
+    h: box.h,
+    fill: { color: 'E4F7F4' },
+    line: { color: 'E4F7F4' },
+    rectRadius: 0.08,
+  });
+  slide.addShape('ellipse', {
+    x: box.x + 0.12,
+    y: box.y + 0.11,
+    w: 0.26,
+    h: 0.26,
+    fill: { color: C.teal },
+    line: { color: C.teal },
+  });
+  slide.addText('≈', {
+    x: box.x + 0.12,
+    y: box.y + 0.11,
+    w: 0.26,
+    h: 0.26,
+    fontFace: F.body,
+    fontSize: 12,
+    bold: true,
+    color: C.navy,
+    align: 'center',
+    valign: 'middle',
+    isTextBox: true,
+    margin: 0,
+  });
+  slide.addText(
+    [
+      { text: 'Think of it like this  ', options: { bold: true, color: C.navy } },
+      { text, options: { color: C.ink } },
+    ],
+    {
+      x: box.x + 0.46,
+      y: box.y + 0.07,
+      w: box.w - 0.58,
+      h: box.h - 0.14,
+      fontFace: F.body,
+      fontSize: opts.fontSize || 10.5,
+      valign: 'top',
+      isTextBox: true,
+      margin: 0,
+    }
+  );
+}
+
+/** Numeric example: white card with a navy outline, a bold title, and math-font lines. */
+function exampleCard(slide, ex, box, opts = {}) {
+  slide.addShape('roundRect', {
+    x: box.x,
+    y: box.y,
+    w: box.w,
+    h: box.h,
+    fill: { color: C.white },
+    line: { color: C.navy, width: 1 },
+    rectRadius: 0.08,
+  });
+  slide.addShape('roundRect', {
+    x: box.x + 0.12,
+    y: box.y - 0.12,
+    w: 1.0,
+    h: 0.24,
+    fill: { color: C.navy },
+    line: { color: C.navy },
+    rectRadius: 0.06,
+  });
+  slide.addText('EXAMPLE', {
+    x: box.x + 0.12,
+    y: box.y - 0.12,
+    w: 1.0,
+    h: 0.24,
+    fontFace: F.body,
+    fontSize: 8.5,
+    bold: true,
+    color: C.white,
+    align: 'center',
+    valign: 'middle',
+    charSpacing: 1,
+    isTextBox: true,
+    margin: 0,
+  });
+  const runs = [{ text: ex.title, options: { bold: true, color: C.navy, fontFace: F.body, breakLine: true } }];
+  ex.lines.forEach((l, i) => {
+    runs.push({ text: l, options: { color: C.ink, fontFace: F.math, breakLine: i < ex.lines.length - 1, bullet: { code: '2022', indent: 9 } } });
+  });
+  slide.addText(runs, {
+    x: box.x + 0.14,
+    y: box.y + 0.15,
+    w: box.w - 0.24,
+    h: box.h - 0.2,
+    fontSize: opts.fontSize || 10,
+    valign: 'top',
+    isTextBox: true,
+    margin: 0,
+    paraSpaceAfter: 1,
+  });
+}
+
 /** Large stat callout: big number with a small label under it. */
 function stat(slide, value, label, box, opts = {}) {
   const dark = !!opts.dark;
@@ -422,6 +526,8 @@ module.exports = {
   bullets,
   equation,
   expertCorner,
+  analogyCard,
+  exampleCard,
   stat,
   caption,
   card,
