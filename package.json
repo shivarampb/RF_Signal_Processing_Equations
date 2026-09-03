@@ -1,0 +1,23 @@
+{
+  "name": "rf-signal-processing-equations",
+  "version": "1.0.0",
+  "description": "RF signal processing presentation: equations, ADC internals, FFT/IFFT. Deck generated with pptxgenjs.",
+  "scripts": {
+    "build": "node src/build_deck.js",
+    "check": "node src/dsp.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivarampb/RF_Signal_Processing_Equations.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shivarampb/RF_Signal_Processing_Equations/issues"
+  },
+  "homepage": "https://github.com/shivarampb/RF_Signal_Processing_Equations#readme",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
