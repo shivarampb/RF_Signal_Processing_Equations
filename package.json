@@ -4,6 +4,8 @@
   "description": "RF signal processing presentation: equations, ADC internals, FFT/IFFT. Deck generated with pptxgenjs.",
   "scripts": {
     "build": "node src/build_deck.js",
+    "outline": "node src/build_outline.js",
+    "app": "node app/build_standalone.js",
     "check": "node src/dsp.js"
   },
   "repository": {

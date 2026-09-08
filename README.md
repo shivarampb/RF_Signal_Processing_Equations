@@ -12,8 +12,16 @@ Every content slide follows the same recipe:
 Expert-level detail is not on the slides. It lives in the speaker notes of each slide and in five
 appendix slides at the end, so the RF engineers still get the derivations and trade-offs.
 
+There is also an **interactive web app**, `app/`, where every idea in the talk becomes a slider you
+can move: change the sample rate and watch a wave get disguised, step a SAR converter one clock tick
+at a time, switch off an FFT bucket and see the hum disappear. Open `app/index.html` in any browser,
+or run it during the talk instead of clicking through slides.
+
 | File | What it is |
 |---|---|
+| `app/index.html` | **The interactive app**: 13 labs and a quiz, everything computed live in the browser. Open it directly — no server, no build, no dependencies |
+| `app/rf-signal-lab.html` | Source of the app (page body only, the form the artifact host expects) |
+| `app/build_standalone.js` | Wraps that source into the standalone `app/index.html` |
 | `presentation/RF_Signal_Processing.pptx` | The deck: 51 slides (45 presented + 5 appendix + closing), speaker notes on every slide, 23 native editable PowerPoint charts |
 | `presentation/outline.md` | Slide-by-slide outline: bullets, analogies, examples, equations, expert notes, speaker notes, timing |
 | `src/content.js` | Single source of truth for all slide text. Edit here, then rebuild both outputs |
@@ -31,9 +39,34 @@ JavaScript at build time, so they can be restyled or inspected inside PowerPoint
 ```bash
 npm install            # installs pptxgenjs only
 npm run check          # DSP self-checks: FFT = DFT, IFFT round trip, SNR(12 bit) = 74 dB, bucket arithmetic
-node src/build_outline.js
+npm run outline        # writes presentation/outline.md
 npm run build          # writes presentation/RF_Signal_Processing.pptx
+npm run app            # writes app/index.html from app/rf-signal-lab.html
 ```
+
+The app needs nothing installed: it is one self-contained HTML file. `npm install` is only for
+rebuilding the PowerPoint deck.
+
+## The interactive labs
+
+| # | Lab | What you can play with |
+|---:|---|---|
+| 1 | The wave | Height, frequency and starting point of a sine wave |
+| 2 | Decibels | Transmit power and a chain of gains and losses, in dBm |
+| 3 | I and Q | Drag the (I, Q) point, or pick a QPSK symbol, and watch the wave it makes |
+| 4 | Noise & link budget | Distance, band, channel width, noise figure → does the link close? |
+| 5 | Sampling & aliasing | Wave frequency against sample rate; watch a fast tone disguise itself |
+| 6 | Quantisation & bits | Bits and signal height; the staircase, the error, and the measured SNR |
+| 7 | SAR: the guessing game | Step the converter one clock tick at a time and watch the bits land |
+| 8 | Timing wobble | Input frequency against clock jitter; how many bits survive |
+| 9 | FFT explorer | Two tones plus hiss, record length, and the Hann window |
+| 10 | Why the FFT is fast | Slide N and compare N² against (N/2)·log₂N |
+| 11 | IFFT: build a filter | Switch FFT buckets off and watch the hum vanish from the rebuilt signal |
+| 12 | OFDM in Wi-Fi | Subcarrier count; the transmitted waveform and the recovered symbols |
+| 13 | Design calculator | A whole receiver: frequency, sample rate, bits, FFT size, jitter |
+
+Every chart is drawn from the same FFT, quantiser and SAR code in `src/dsp.js` that generated the
+slide deck, so the app and the slides can never disagree.
 
 ## Talk structure (about 90 minutes)
 

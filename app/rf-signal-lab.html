@@ -1,0 +1,1172 @@
+<title>RF Signal Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #eef2f7;
+    --surface: #ffffff;
+    --surface-2: #e3eaf3;
+    --ink: #0f2440;
+    --ink-2: #445570;
+    --muted: #77869c;
+    --line: #d2dbe7;
+    --grid: #e6ecf3;
+    --accent: #0e7c76;
+    --accent-ink: #0b5d58;
+    --accent-soft: #dcefed;
+    --s1: #1baf7a;
+    --s2: #eb6834;
+    --s3: #2a78d6;
+    --s4: #eda100;
+    --good: #1a7f37;
+    --bad: #c0392b;
+    --good-soft: #e2f1e6;
+    --bad-soft: #fae7e4;
+    --tip-bg: #0f2440;
+    --tip-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0c1522;
+      --surface: #131f30;
+      --surface-2: #1a273a;
+      --ink: #e7edf5;
+      --ink-2: #b3c1d3;
+      --muted: #8194ab;
+      --line: #29384e;
+      --grid: #223146;
+      --accent: #3fb5ab;
+      --accent-ink: #62ccc2;
+      --accent-soft: #103430;
+      --s1: #199e70;
+      --s2: #d95926;
+      --s3: #3987e5;
+      --s4: #c98500;
+      --good: #46b862;
+      --bad: #e8695c;
+      --good-soft: #14301f;
+      --bad-soft: #34191a;
+      --tip-bg: #e7edf5;
+      --tip-ink: #0c1522;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0c1522;
+    --surface: #131f30;
+    --surface-2: #1a273a;
+    --ink: #e7edf5;
+    --ink-2: #b3c1d3;
+    --muted: #8194ab;
+    --line: #29384e;
+    --grid: #223146;
+    --accent: #3fb5ab;
+    --accent-ink: #62ccc2;
+    --accent-soft: #103430;
+    --s1: #199e70;
+    --s2: #d95926;
+    --s3: #3987e5;
+    --s4: #c98500;
+    --good: #46b862;
+    --bad: #e8695c;
+    --good-soft: #14301f;
+    --bad-soft: #34191a;
+    --tip-bg: #e7edf5;
+    --tip-ink: #0c1522;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; text-wrap: balance; margin: 0; }
+  .mono, code { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  a { color: var(--accent-ink); }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { display: grid; grid-template-columns: 258px minmax(0, 1fr); min-height: 100vh; }
+  .side { border-right: 1px solid var(--line); background: var(--surface); padding: 20px 14px 32px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .brand { padding: 0 8px 12px; }
+  .brand h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  .nav-part { margin: 14px 0 3px; padding: 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .nav a { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font-size: 13.5px; }
+  .nav a:hover { background: var(--surface-2); color: var(--ink); }
+  .nav a.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .nav a .n { width: 21px; height: 21px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10.5px; font-weight: 600; background: var(--surface-2); color: var(--ink-2); flex: none; }
+  .nav a.active .n { background: var(--accent); color: #fff; }
+
+  .main { padding: 28px 34px 60px; max-width: 1200px; }
+  .eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 7px; }
+  .panel h2 { font-size: 29px; font-weight: 700; line-height: 1.16; letter-spacing: -0.01em; margin-bottom: 9px; }
+  .idea { font-size: 16px; color: var(--ink-2); max-width: 68ch; margin: 0 0 20px; }
+
+  .lab { display: grid; grid-template-columns: 296px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .controls { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 15px 17px; display: grid; gap: 13px; position: sticky; top: 18px; }
+  .controls h3 { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .ctl > label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); margin-bottom: 3px; }
+  .ctl output { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .ctl input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
+  .seg { display: flex; flex-wrap: wrap; gap: 5px; }
+  .seg button { padding: 4px 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); border-radius: 999px; cursor: pointer; font-size: 12.5px; }
+  .seg button:hover { border-color: var(--accent); }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn { padding: 7px 13px; border-radius: 7px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; font-weight: 600; font-size: 13px; }
+  .btn.ghost { background: transparent; color: var(--accent-ink); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+
+  .charts { display: grid; gap: 12px; min-width: 0; }
+  .chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px 7px; min-width: 0; }
+  .chart .t { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin: 0 0 3px 3px; }
+  .chart canvas { width: 100%; display: block; touch-action: pan-y; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+
+  .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 9px; }
+  .ro { background: var(--surface-2); border-radius: 8px; padding: 9px 11px; }
+  .ro .v { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.25; }
+  .ro .l { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .ro.good { background: var(--good-soft); } .ro.good .v { color: var(--good); }
+  .ro.bad { background: var(--bad-soft); } .ro.bad .v { color: var(--bad); }
+  .ro.accent .v { color: var(--accent-ink); }
+
+  .below { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  .card { border-radius: 10px; padding: 15px 17px; }
+  .card b { display: block; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 5px; }
+  .analogy { background: var(--accent-soft); }
+  .analogy b { color: var(--accent-ink); }
+  .eqcard { background: var(--surface); border: 1px solid var(--line); }
+  .eqcard b, .trycard b { color: var(--muted); }
+  .eqcard .eq { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13px; line-height: 1.85; overflow-x: auto; }
+  .eqcard .eq .live { color: var(--accent-ink); font-weight: 500; }
+  .trycard { background: var(--surface); border: 1px dashed var(--line); grid-column: 1 / -1; }
+  .trycard ol { margin: 0; padding-left: 19px; color: var(--ink-2); font-size: 14px; }
+  .trycard li { margin: 3px 0; }
+
+  .chain { display: flex; gap: 5px; align-items: stretch; margin: 4px 0 18px; overflow-x: auto; padding-bottom: 5px; }
+  .chain a { flex: 1 0 116px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; text-decoration: none; color: inherit; }
+  .chain a:hover { border-color: var(--accent); }
+  .chain .k { font-weight: 600; font-size: 13.5px; }
+  .chain .d { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .chain .arrow { align-self: center; color: var(--muted); flex: none; }
+
+  .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 11px; margin-top: 8px; }
+  .home-grid a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px; text-decoration: none; color: inherit; }
+  .home-grid a:hover { border-color: var(--accent); }
+  .home-grid .p { font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  .home-grid .h { font-family: "Source Serif 4", Georgia, serif; font-size: 16.5px; font-weight: 600; margin: 3px 0 3px; }
+  .home-grid .s { font-size: 12.5px; color: var(--ink-2); }
+  .section-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+
+  .pill { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+  table.steps { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.steps th, table.steps td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+  table.steps th { color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+  table.steps td.m { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  table.steps tr.now td { background: var(--accent-soft); }
+  .tablewrap { overflow-x: auto; }
+
+  .bins { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; margin-top: 4px; }
+  .bins button { height: 24px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface-2); cursor: pointer; padding: 0; }
+  .bins button.on { background: var(--s1); border-color: var(--s1); }
+  .bins button.hum { background: var(--s2); border-color: var(--s2); }
+  .bins button.off { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 3px, var(--line) 3px, var(--line) 5px); }
+
+  .q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .q p { margin: 0 0 9px; font-weight: 600; }
+  .opts { display: grid; gap: 5px; }
+  .opts button { text-align: left; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .opts button:hover:not(:disabled) { border-color: var(--accent); }
+  .opts button.right { background: var(--good-soft); border-color: var(--good); }
+  .opts button.wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .why { font-size: 13px; color: var(--ink-2); margin-top: 7px; }
+  .foot { margin-top: 34px; color: var(--muted); font-size: 12.5px; max-width: 68ch; }
+
+  @media (max-width: 940px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-part { width: 100%; margin-top: 8px; }
+    .main { padding: 20px 15px 44px; }
+    .lab { grid-template-columns: 1fr; }
+    .controls { position: static; }
+    .two { grid-template-columns: 1fr; }
+    .below { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><h1>RF Signal Lab</h1><p>Move a slider, watch the maths</p></div>
+    <nav class="nav" id="nav" aria-label="Labs"></nav>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+(() => {
+'use strict';
+const TWO_PI = 2 * Math.PI;
+
+/* ===================== DSP: the same maths that generated the slide deck ===================== */
+function linspace(a, b, n) { const o = new Array(n); for (let i = 0; i < n; i++) o[i] = a + (b - a) * i / (n - 1); return o; }
+function quantize(v, bits, vfs) {
+  const lsb = vfs / 2 ** bits, maxC = 2 ** (bits - 1) - 1, minC = -(2 ** (bits - 1));
+  return Math.max(minC, Math.min(maxC, Math.round(v / lsb))) * lsb;
+}
+function snrBits(b) { return 6.02 * b + 1.76; }
+function jitterSnr(f, tj) { return -20 * Math.log10(TWO_PI * f * tj); }
+function bitReverse(i, bits) { let r = 0; for (let b = 0; b < bits; b++) { r = (r << 1) | (i & 1); i >>= 1; } return r; }
+function fft(reIn, imIn) {
+  const N = reIn.length, bits = Math.log2(N), re = new Array(N), im = new Array(N);
+  for (let i = 0; i < N; i++) { const j = bitReverse(i, bits); re[j] = reIn[i]; im[j] = imIn ? imIn[i] : 0; }
+  for (let size = 2; size <= N; size <<= 1) {
+    const half = size >> 1, step = -TWO_PI / size;
+    for (let start = 0; start < N; start += size) for (let k = 0; k < half; k++) {
+      const wr = Math.cos(step * k), wi = Math.sin(step * k), i1 = start + k, i2 = i1 + half;
+      const tr = re[i2] * wr - im[i2] * wi, ti = re[i2] * wi + im[i2] * wr;
+      re[i2] = re[i1] - tr; im[i2] = im[i1] - ti; re[i1] += tr; im[i1] += ti;
+    }
+  }
+  return { re, im };
+}
+function ifft(re, im) { const N = re.length, y = fft(re, im.map(v => -v)); return { re: y.re.map(v => v / N), im: y.im.map(v => -v / N) }; }
+function hann(N) { const w = new Array(N); for (let n = 0; n < N; n++) w[n] = 0.5 * (1 - Math.cos(TWO_PI * n / N)); return w; }
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function gaussian(next) { let s = 0; for (let i = 0; i < 12; i++) s += next(); return s - 6; }
+function sarSteps(vin, bits) {
+  const steps = []; let code = 0;
+  for (let b = bits - 1; b >= 0; b--) {
+    const trial = code | (1 << b), v = trial / 2 ** bits, keep = vin >= v;
+    steps.push({ cycle: bits - b, trial: v, keep, codeAfter: keep ? trial : code });
+    if (keep) code = trial;
+  }
+  return { steps, code, vout: code / 2 ** bits };
+}
+
+/* ===================== formatting ===================== */
+const SI = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, 'µ'], [1e-9, 'n'], [1e-12, 'p'], [1e-15, 'f']];
+const fmt = {
+  si(v, unit, d) {
+    d = d || 3; unit = unit || '';
+    if (!isFinite(v)) return '–';
+    if (v === 0) return '0 ' + unit;
+    const a = Math.abs(v);
+    for (const [s, pre] of SI) if (a >= s * 0.9995) return trim((v / s).toPrecision(d)) + ' ' + pre + unit;
+    return v.toExponential(2) + ' ' + unit;
+  },
+  n(v, d) { return Number(v).toFixed(d === undefined ? 1 : d); },
+  int(v) { return Math.round(v).toLocaleString('en-US'); },
+};
+function trim(s) { return s.indexOf('.') >= 0 ? s.replace(/\.?0+$/, '') : s; }
+
+/* ===================== theme-aware canvas charts ===================== */
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function niceTicks(min, max, count) {
+  const span = (max - min) || 1, raw = span / (count || 5), mag = 10 ** Math.floor(Math.log10(raw)), r = raw / mag;
+  const step = (r < 1.5 ? 1 : r < 3 ? 2 : r < 7 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(min / step - 1e-9) * step; v <= max + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+let charts = [];
+function makeChart(host, title, height) {
+  height = height || 220;
+  const wrap = document.createElement('div'); wrap.className = 'chart';
+  if (title) { const t = document.createElement('div'); t.className = 't'; t.textContent = title; wrap.appendChild(t); }
+  const canvas = document.createElement('canvas'); canvas.height = height; wrap.appendChild(canvas); host.appendChild(wrap);
+  const ch = { canvas, height, spec: null, hover: null };
+  ch.draw = (spec) => { if (spec) ch.spec = spec; paint(ch); };
+  const move = (clientX) => { const r = canvas.getBoundingClientRect(); ch.hover = clientX - r.left; paint(ch); };
+  canvas.addEventListener('mousemove', e => move(e.clientX));
+  canvas.addEventListener('mouseleave', () => { ch.hover = null; paint(ch); });
+  canvas.addEventListener('touchmove', e => { if (e.touches[0]) move(e.touches[0].clientX); }, { passive: true });
+  canvas.addEventListener('touchend', () => { ch.hover = null; paint(ch); });
+  charts.push(ch);
+  new ResizeObserver(() => paint(ch)).observe(wrap);
+  return ch;
+}
+function paint(ch) {
+  const spec = ch.spec; if (!spec) return;
+  const cv = ch.canvas, W = cv.clientWidth, H = ch.height;
+  if (!W) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const C = { ink: css('--ink'), ink2: css('--ink-2'), muted: css('--muted'), grid: css('--grid'), line: css('--line'), surface: css('--surface'), tipBg: css('--tip-bg'), tipInk: css('--tip-ink'), s: [css('--s1'), css('--s2'), css('--s3'), css('--s4')] };
+  const legend = spec.series.filter(s => s.label).length >= 2 ? 18 : 0;
+  const pad = { l: spec.ylabel ? 54 : 42, r: 12, t: 8 + legend, b: spec.xlabel ? 36 : 22 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+  if (pw <= 10 || ph <= 10) return;
+  const live = spec.series.filter(s => s.xs.length);
+  let xmin = spec.xmin, xmax = spec.xmax, ymin = spec.ymin, ymax = spec.ymax;
+  if (xmin === undefined) xmin = Math.min(...live.map(s => Math.min(...s.xs)));
+  if (xmax === undefined) xmax = Math.max(...live.map(s => Math.max(...s.xs)));
+  if (ymin === undefined) ymin = Math.min(0, ...live.map(s => Math.min(...s.ys)));
+  if (ymax === undefined) ymax = Math.max(...live.map(s => Math.max(...s.ys)));
+  if (!(xmax > xmin)) xmax = xmin + 1;
+  if (!(ymax > ymin)) ymax = ymin + 1;
+  const X = v => pad.l + (v - xmin) / (xmax - xmin) * pw;
+  const Y = v => pad.t + (ymax - v) / (ymax - ymin) * ph;
+  const clampY = v => Math.max(ymin - (ymax - ymin), Math.min(ymax + (ymax - ymin), v));
+
+  g.font = '11px "IBM Plex Mono", ui-monospace, monospace';
+  g.strokeStyle = C.grid; g.lineWidth = 1; g.fillStyle = C.muted; g.textAlign = 'right'; g.textBaseline = 'middle';
+  for (const t of niceTicks(ymin, ymax, 4)) {
+    const y = Y(t); if (y < pad.t - 1 || y > pad.t + ph + 1) continue;
+    g.beginPath(); g.moveTo(pad.l, y); g.lineTo(W - pad.r, y); g.stroke();
+    g.fillText(spec.yfmt ? spec.yfmt(t) : String(t), pad.l - 6, y);
+  }
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  for (const t of niceTicks(xmin, xmax, spec.xticks || 6)) {
+    const x = X(t); if (x < pad.l - 1 || x > W - pad.r + 1) continue;
+    const lab = spec.xfmt ? spec.xfmt(t) : String(t);
+    if (lab) g.fillText(lab, x, pad.t + ph + 5);
+  }
+  g.strokeStyle = C.line; g.beginPath(); g.moveTo(pad.l, pad.t + ph); g.lineTo(W - pad.r, pad.t + ph); g.stroke();
+  if (ymin < 0 && ymax > 0) { g.beginPath(); g.moveTo(pad.l, Y(0)); g.lineTo(W - pad.r, Y(0)); g.stroke(); }
+
+  g.fillStyle = C.ink2; g.font = '11.5px "IBM Plex Sans", system-ui, sans-serif';
+  if (spec.xlabel) { g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillText(spec.xlabel, pad.l + pw / 2, H - 3); }
+  if (spec.ylabel) { g.save(); g.translate(11, pad.t + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(spec.ylabel, 0, 0); g.restore(); }
+
+  g.save(); g.beginPath(); g.rect(pad.l, pad.t - 3, pw, ph + 6); g.clip();
+  spec.series.forEach((s, si) => {
+    const col = s.color || C.s[si % 4], kind = s.kind || 'line';
+    g.strokeStyle = col; g.fillStyle = col; g.lineWidth = s.width || 2;
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (kind === 'bar') {
+      const n = s.xs.length, bw = Math.max(1.5, pw / Math.max(n, 1) * 0.7), y0 = Y(Math.max(ymin, 0));
+      for (let i = 0; i < n; i++) {
+        const y = Y(clampY(s.ys[i])), top = Math.min(y, y0), h = Math.abs(y0 - y);
+        if (h < 0.4) continue;
+        g.beginPath(); g.roundRect(X(s.xs[i]) - bw / 2, top, bw, h, [Math.min(3, bw / 2), Math.min(3, bw / 2), 0, 0]); g.fill();
+      }
+    } else if (kind === 'stem') {
+      const y0 = Y(Math.max(ymin, Math.min(ymax, 0)));
+      g.lineWidth = 1.5;
+      for (let i = 0; i < s.xs.length; i++) {
+        const x = X(s.xs[i]), y = Y(clampY(s.ys[i]));
+        g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y); g.stroke();
+        g.beginPath(); g.arc(x, y, 3, 0, TWO_PI); g.fill();
+      }
+    } else {
+      if (kind !== 'dots') {
+        g.beginPath();
+        for (let i = 0; i < s.xs.length; i++) {
+          const x = X(s.xs[i]), y = Y(clampY(s.ys[i]));
+          if (i === 0) g.moveTo(x, y);
+          else if (kind === 'step') { g.lineTo(x, Y(clampY(s.ys[i - 1]))); g.lineTo(x, y); }
+          else g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+      if (kind === 'dots' || s.dots) {
+        const r = s.r || 3.5;
+        for (let i = 0; i < s.xs.length; i++) {
+          g.beginPath(); g.arc(X(s.xs[i]), Y(clampY(s.ys[i])), r, 0, TWO_PI); g.fill();
+          g.strokeStyle = C.surface; g.lineWidth = 1.5; g.stroke(); g.strokeStyle = col;
+        }
+      }
+    }
+  });
+  g.restore();
+
+  const labelled = spec.series.filter(s => s.label);
+  if (legend) {
+    g.font = '11.5px "IBM Plex Sans", system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';
+    let x = pad.l, y = 9;
+    labelled.forEach(s => {
+      const col = s.color || C.s[spec.series.indexOf(s) % 4], w = g.measureText(s.label).width;
+      if (x + 16 + w > W - pad.r) return;
+      g.fillStyle = col; g.beginPath(); g.roundRect(x, y - 4, 13, 8, 2); g.fill();
+      g.fillStyle = C.ink2; g.fillText(s.label, x + 17, y); x += 17 + w + 14;
+    });
+  }
+
+  if (ch.hover !== null && spec.tip) {
+    const hi = spec.tipSeries || 0, hs = spec.series[hi];
+    if (hs && hs.xs.length && ch.hover >= pad.l && ch.hover <= W - pad.r) {
+      const xv = xmin + (ch.hover - pad.l) / pw * (xmax - xmin);
+      let bi = 0, bd = Infinity;
+      for (let i = 0; i < hs.xs.length; i++) { const d = Math.abs(hs.xs[i] - xv); if (d < bd) { bd = d; bi = i; } }
+      const x = X(hs.xs[bi]), y = Y(clampY(hs.ys[bi]));
+      g.strokeStyle = C.muted; g.lineWidth = 1; g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, pad.t + ph); g.stroke(); g.setLineDash([]);
+      g.fillStyle = hs.color || C.s[hi % 4]; g.beginPath(); g.arc(x, y, 4.5, 0, TWO_PI); g.fill();
+      g.strokeStyle = C.surface; g.lineWidth = 2; g.stroke();
+      const lines = spec.tip(bi, hs).filter(Boolean);
+      if (lines.length) {
+        g.font = '12px "IBM Plex Mono", ui-monospace, monospace';
+        const w = Math.max(...lines.map(l => g.measureText(l).width)) + 16, h = lines.length * 16 + 10;
+        let tx = x + 12, ty = pad.t + 4;
+        if (tx + w > W - pad.r) tx = Math.max(pad.l, x - 12 - w);
+        g.fillStyle = C.tipBg; g.beginPath(); g.roundRect(tx, ty, w, h, 6); g.fill();
+        g.fillStyle = C.tipInk; g.textAlign = 'left'; g.textBaseline = 'top';
+        lines.forEach((l, i) => g.fillText(l, tx + 8, ty + 6 + i * 16));
+      }
+    }
+  }
+}
+const repaintAll = () => charts.forEach(paint);
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+if (mq.addEventListener) mq.addEventListener('change', repaintAll);
+new MutationObserver(repaintAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ===================== small UI builders ===================== */
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
+function slider(host, label, opts) {
+  const wrap = el('div', 'ctl'), lab = el('label'), out = el('output');
+  lab.append(el('span', null, label), out);
+  const inp = document.createElement('input');
+  inp.type = 'range'; inp.min = opts.min; inp.max = opts.max; inp.step = opts.step; inp.value = opts.log ? Math.log10(opts.value) : opts.value;
+  inp.setAttribute('aria-label', label);
+  wrap.append(lab, inp); host.appendChild(wrap);
+  const get = () => opts.log ? 10 ** Number(inp.value) : Number(inp.value);
+  const show = () => { out.textContent = opts.fmt(get()); };
+  inp.addEventListener('input', () => { show(); opts.on(get()); });
+  show();
+  return { get, set(v) { inp.value = opts.log ? Math.log10(v) : v; show(); } };
+}
+function segmented(host, label, items, value, on) {
+  const wrap = el('div', 'ctl');
+  if (label) wrap.appendChild(el('label', null, '<span>' + label + '</span>'));
+  const seg = el('div', 'seg');
+  const btns = items.map(it => {
+    const b = el('button', JSON.stringify(it.value) === JSON.stringify(value) ? 'on' : '', it.label);
+    b.type = 'button';
+    b.addEventListener('click', () => { btns.forEach(x => x.classList.remove('on')); b.classList.add('on'); on(it.value); });
+    seg.appendChild(b); return b;
+  });
+  wrap.appendChild(seg); host.appendChild(wrap);
+  return { select(v) { btns.forEach((b, i) => b.classList.toggle('on', JSON.stringify(items[i].value) === JSON.stringify(v))); } };
+}
+function buttons(host, defs) {
+  const row = el('div', 'seg');
+  const made = defs.map(d => { const b = el('button', 'btn' + (d.ghost ? ' ghost' : ''), d.label); b.addEventListener('click', d.on); row.appendChild(b); return b; });
+  host.appendChild(row); return made;
+}
+function readouts(host, defs) {
+  const grid = el('div', 'readouts'), map = {};
+  defs.forEach(d => {
+    const ro = el('div', 'ro' + (d.cls ? ' ' + d.cls : '')), v = el('div', 'v', '–'), l = el('div', 'l', d.label);
+    ro.append(v, l); grid.appendChild(ro); map[d.key] = { v, ro, base: 'ro' + (d.cls ? ' ' + d.cls : '') };
+  });
+  host.appendChild(grid);
+  return { set(key, text, state) { const m = map[key]; m.v.textContent = text; if (state !== undefined) m.ro.className = m.base + (state ? ' ' + state : ''); } };
+}
+function panel(main, eyebrow, title, idea) {
+  const p = el('section', 'panel');
+  p.append(el('div', 'eyebrow', eyebrow), el('h2', null, title), el('p', 'idea', idea));
+  main.appendChild(p); return p;
+}
+function labLayout(p) {
+  const lab = el('div', 'lab'), controls = el('div', 'controls'), out = el('div', 'charts');
+  controls.appendChild(el('h3', null, 'Controls'));
+  lab.append(controls, out); p.appendChild(lab);
+  return { controls, out };
+}
+function below(p, analogy, tries) {
+  const b = el('div', 'below');
+  b.appendChild(el('div', 'card analogy', '<b>Think of it like this</b>' + analogy));
+  const eq = el('div', 'card eqcard', '<b>The equation, with your numbers</b><div class="eq"></div>');
+  b.appendChild(eq);
+  if (tries) b.appendChild(el('div', 'card trycard', '<b>Try this</b><ol>' + tries.map(t => '<li>' + t + '</li>').join('') + '</ol>'));
+  p.appendChild(b);
+  const eqEl = eq.querySelector('.eq');
+  return html => { eqEl.innerHTML = html; };
+}
+const hi = v => '<span class="live">' + v + '</span>';
+function note(host, text) { host.appendChild(el('div', 'chart', '<div class="t">Reading the chart</div><div style="font-size:13px;color:var(--ink-2)">' + text + '</div>')); }
+
+/* ===================== labs ===================== */
+const LABS = [];
+const lab = def => LABS.push(def);
+
+lab({ id: 'home', part: 'Start', nav: 'Overview', build(main) {
+  const count = LABS.filter(l => l.id !== 'home' && l.id !== 'quiz').length;
+  const words = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen'];
+  const word = words[count] || String(count);
+  const p = panel(main, 'Start here', 'How a radio wave becomes numbers',
+    word + ' small laboratories, one idea each. Move a slider and the picture, the readouts and the equation all update together. Start anywhere; the order below follows the talk.');
+  const two = el('div', 'two'); p.appendChild(two);
+  const chT = makeChart(two, 'A messy signal in time: how many tones are in here?', 190);
+  const chF = makeChart(two, 'The same readings after an FFT: two tones, plainly', 190);
+  const N = 256, fs = 256, next = rng(11), x = [];
+  for (let n = 0; n < N; n++) x.push(Math.cos(TWO_PI * 30 * n / fs) + 0.3 * Math.cos(TWO_PI * 75 * n / fs + 0.7) + 0.06 * gaussian(next));
+  const X = fft(x, new Array(N).fill(0)), mag = [], kf = [];
+  for (let k = 0; k < N / 2; k++) { mag.push(20 * Math.log10(Math.max(Math.hypot(X.re[k], X.im[k]) / (N / 2), 1e-9))); kf.push(k); }
+  chT.draw({ series: [{ xs: x.map((_, i) => i).slice(0, 128), ys: x.slice(0, 128), color: css('--muted'), width: 1.5 }], ymin: -1.8, ymax: 1.8, xlabel: 'reading number', tip: (i, s) => ['reading ' + i, 'value ' + s.ys[i].toFixed(3)] });
+  chF.draw({ series: [{ xs: kf, ys: mag, width: 1.5 }], ymin: -80, ymax: 5, xlabel: 'frequency (kHz)', ylabel: 'dB', tip: (i, s) => ['bucket ' + i, s.xs[i] + ' kHz', s.ys[i].toFixed(1) + ' dB'] });
+
+  p.appendChild(el('div', 'section-label', 'The receive chain · click a block'));
+  const chain = el('div', 'chain');
+  [['Antenna', 'catches the wave', 'wave'], ['LNA', 'amplifies quietly', 'noise'], ['Mixer', 'slows it down', 'iq'],
+   ['Filter', 'keeps the channel', 'sampling'], ['ADC', 'voltage → numbers', 'quant'], ['DSP / FFT', 'numbers → data', 'fft']]
+    .forEach(([k, d, id], i, arr) => {
+      const a = el('a', null, '<div class="k">' + k + '</div><div class="d">' + d + '</div>'); a.href = '#' + id; chain.appendChild(a);
+      if (i < arr.length - 1) chain.appendChild(el('span', 'arrow', '→'));
+    });
+  p.appendChild(chain);
+
+  p.appendChild(el('div', 'section-label', 'All ' + word.toLowerCase() + ' labs, plus a quiz'));
+  const grid = el('div', 'home-grid');
+  LABS.filter(l => l.id !== 'home').forEach(l => {
+    const a = el('a', null, '<div class="p">' + l.part + '</div><div class="h">' + l.nav + '</div><div class="s">' + (l.blurb || '') + '</div>');
+    a.href = '#' + l.id; grid.appendChild(a);
+  });
+  p.appendChild(grid);
+  p.appendChild(el('p', 'foot', 'Companion to the "RF Signal Processing" talk. Every chart is computed live in your browser by the same FFT, quantiser and successive-approximation code that generated the slide deck — nothing here is a picture.'));
+}});
+
+lab({ id: 'wave', part: 'Part 1', nav: 'The wave', blurb: 'Three knobs: height, frequency, starting point.', build(main) {
+  const p = panel(main, 'Part 1 · What an RF signal is', 'An RF signal is a very fast wave',
+    'A radio signal is a voltage that swings up and down like a sine wave. Only three numbers describe it: how tall it is (A), how many times a second it repeats (f), and where in the swing it started (φ). Move each one and watch what changes.');
+  const { controls, out } = labLayout(p);
+  const st = { A: 1, f: 2, phi: 0 };
+  const ch = makeChart(out, 'x(t) = A · cos(2π f t + φ)', 250);
+  const ro = readouts(out, [{ key: 'T', label: 'one repeat takes' }, { key: 'lam', label: 'wavelength, if this were f gigahertz' }, { key: 'w', label: 'angular frequency ω = 2πf' }]);
+  const setEq = below(p, 'A wave is a spinning bicycle wheel seen from the side. A is the size of the wheel, f is how many turns a second, and φ is where the valve was when you started watching.',
+    ['Set φ to 90°: the cosine becomes a sine. Same wave, different starting moment.',
+     'Double f and watch the repeat time halve. Real Wi-Fi runs at 2.4 GHz, so one repeat takes 0.42 nanoseconds.',
+     'Drop A to 0.3. Quieter, but the frequency has not changed: volume and pitch are independent.']);
+  function draw() {
+    const t = linspace(0, 2, 400);
+    const ref = t.map(v => Math.cos(TWO_PI * 2 * v));
+    const y = t.map(v => st.A * Math.cos(TWO_PI * st.f * v + st.phi * Math.PI / 180));
+    ch.draw({ series: [
+      { xs: t, ys: ref, label: 'reference: A = 1, f = 2, φ = 0°', color: css('--line'), width: 1.5 },
+      { xs: t, ys: y, label: 'your wave' }],
+      tipSeries: 1, ymin: -1.2, ymax: 1.2, xlabel: 'time (seconds)', ylabel: 'x(t)',
+      tip: (i, s) => ['t = ' + s.xs[i].toFixed(3) + ' s', 'x = ' + s.ys[i].toFixed(3)] });
+    ro.set('T', fmt.si(1 / st.f, 's'));
+    ro.set('lam', fmt.si(3e8 / (st.f * 1e9), 'm'));
+    ro.set('w', fmt.n(TWO_PI * st.f, 2) + ' rad/s');
+    setEq('x(t) = ' + hi(st.A.toFixed(2)) + ' · cos(2π · ' + hi(st.f.toFixed(1)) + ' · t + ' + hi(st.phi + '°') + ')<br>'
+      + 'one repeat: T = 1 / ' + st.f.toFixed(1) + ' = ' + hi(fmt.si(1 / st.f, 's')));
+  }
+  slider(controls, 'Height A', { min: 0, max: 1, step: 0.05, value: 1, fmt: v => v.toFixed(2), on: v => { st.A = v; draw(); } });
+  slider(controls, 'Frequency f', { min: 0.5, max: 6, step: 0.1, value: 2, fmt: v => v.toFixed(1) + ' Hz', on: v => { st.f = v; draw(); } });
+  slider(controls, 'Starting point φ', { min: 0, max: 360, step: 5, value: 0, fmt: v => v + '°', on: v => { st.phi = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'db', part: 'Part 1', nav: 'Decibels', blurb: 'Counting zeros instead of writing them.', build(main) {
+  const p = panel(main, 'Part 1 · What an RF signal is', 'Decibels: counting zeros instead of writing them',
+    'Radio powers run from watts down to billionths of a billionth of a watt. Decibels count the zeros, so multiplying becomes adding and a whole receiver chain is one short sum. Slide the power and the gains and watch the sum.');
+  const { controls, out } = labLayout(p);
+  const st = { p: 100, g1: 20, g2: -74, g3: 4 };
+  const ro = readouts(out, [{ key: 'in', label: 'transmitted power' }, { key: 'dbm', label: 'the same power in dBm', cls: 'accent' },
+    { key: 'outw', label: 'received power in watts' }, { key: 'out', label: 'received power in dBm' }]);
+  const ch = makeChart(out, 'Power at each point in the chain', 230);
+  const tbl = el('div', 'chart');
+  tbl.innerHTML = '<div class="t">Landmarks worth remembering</div><div class="tablewrap"><table class="steps">'
+    + '<tr><th>Power</th><th>dBm</th><th>Where you meet it</th></tr>'
+    + '<tr><td>1 W</td><td class="m">+30</td><td>a phone transmitting at full power</td></tr>'
+    + '<tr><td>1 mW</td><td class="m">0</td><td>the reference point</td></tr>'
+    + '<tr><td>1 µW</td><td class="m">−30</td><td>strong Wi-Fi, same room as the router</td></tr>'
+    + '<tr><td>1 pW</td><td class="m">−90</td><td>weak Wi-Fi, two walls away</td></tr>'
+    + '<tr><td>0.1 fW</td><td class="m">−130</td><td>a GPS satellite at your phone</td></tr></table></div>';
+  out.appendChild(tbl);
+  const setEq = below(p, 'dB is shorthand for "how many times". Ten times is +10 dB, a hundred times is +20 dB, twice is +3 dB. A chain of amplifiers and losses, which would be a long multiplication, turns into a short addition.',
+    ['Set the transmit power to 1 mW: that is 0 dBm, by definition.',
+     'Halve the transmit power and watch dBm fall by exactly 3.',
+     'Change the path loss from −74 to −80 dB: the received power drops to a quarter, the same as moving twice as far away.']);
+  const NAMES = ['transmitted', 'after amplifier', 'after the air', 'after antenna'];
+  function draw() {
+    const dbm = 10 * Math.log10(st.p);
+    const stages = [dbm, dbm + st.g1, dbm + st.g1 + st.g2, dbm + st.g1 + st.g2 + st.g3];
+    ro.set('in', fmt.si(st.p / 1000, 'W'));
+    ro.set('dbm', fmt.n(dbm) + ' dBm');
+    ro.set('out', fmt.n(stages[3]) + ' dBm');
+    ro.set('outw', fmt.si(10 ** (stages[3] / 10) / 1000, 'W'));
+    ch.draw({ series: [{ xs: [0, 1, 2, 3], ys: stages, dots: true, r: 5 }],
+      xmin: -0.35, xmax: 3.35, xticks: 4, xfmt: v => NAMES[Math.round(v)] || '',
+      ymin: Math.min.apply(null, stages) - 12, ymax: Math.max.apply(null, stages) + 12, ylabel: 'dBm',
+      tip: (i, s) => [NAMES[i], s.ys[i].toFixed(1) + ' dBm', fmt.si(10 ** (s.ys[i] / 10) / 1000, 'W')] });
+    const sign = v => (v >= 0 ? ' + ' : ' − ') + Math.abs(v);
+    setEq('P(dBm) = 10 · log₁₀(' + hi(trim(st.p.toPrecision(3)) + ' mW') + ' / 1 mW) = ' + hi(fmt.n(dbm) + ' dBm') + '<br>'
+      + fmt.n(dbm) + sign(st.g1) + sign(st.g2) + sign(st.g3) + ' = ' + hi(fmt.n(stages[3]) + ' dBm'));
+  }
+  slider(controls, 'Transmit power', { min: -3, max: 3, step: 0.05, value: 100, log: true, fmt: v => fmt.si(v / 1000, 'W'), on: v => { st.p = v; draw(); } });
+  slider(controls, 'Amplifier gain', { min: 0, max: 40, step: 1, value: 20, fmt: v => '+' + v + ' dB', on: v => { st.g1 = v; draw(); } });
+  slider(controls, 'Loss through the air', { min: -120, max: 0, step: 1, value: -74, fmt: v => v + ' dB', on: v => { st.g2 = v; draw(); } });
+  slider(controls, 'Antenna gain, both ends', { min: 0, max: 20, step: 1, value: 4, fmt: v => '+' + v + ' dBi', on: v => { st.g3 = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'iq', part: 'Part 1', nav: 'I and Q', blurb: 'Any message from two slow numbers.', build(main) {
+  const p = panel(main, 'Part 1 · What an RF signal is', 'I and Q: two numbers describe the whole wave',
+    'Anything you can do to a carrier — make it louder, quieter, shift it in time — can be made by mixing two slow signals, I and Q, with a cosine and a sine. Digital radios simply pick from a fixed menu of (I, Q) points; each point stands for a couple of bits.');
+  const { controls, out } = labLayout(p);
+  const st = { I: 0.71, Q: 0.71 };
+  const two = el('div', 'two'); out.appendChild(two);
+  const chC = makeChart(two, 'The (I, Q) point you picked', 230);
+  const chW = makeChart(two, 'x(t) = I · cos ωt − Q · sin ωt', 230);
+  const ro = readouts(out, [{ key: 'A', label: 'height A = √(I² + Q²)' }, { key: 'phi', label: 'timing shift φ' }, { key: 'bits', label: 'the two bits this quadrant sends', cls: 'accent' }]);
+  const setEq = below(p, 'A flashlight is the carrier. You can send a message by making it brighter and dimmer, or by wiggling it left and right in time. I and Q are the two hands doing the wiggling, and between them they can make any pattern at all.',
+    ['Set Q to 0 and slide I: only the height changes. That is AM radio.',
+     'Keep I² + Q² near 1 while moving both: the height stays put and only the timing shifts. That is PM.',
+     'Click the four QPSK buttons. Real Wi-Fi picks one of those points millions of times a second.']);
+  let sI, sQ;
+  function draw() {
+    const A = Math.hypot(st.I, st.Q), phi = Math.atan2(st.Q, st.I);
+    const t = linspace(0, 1, 400), w = TWO_PI * 4;
+    chW.draw({ series: [
+      { xs: t, ys: t.map(v => Math.cos(w * v)), label: 'plain carrier', color: css('--line'), width: 1.5 },
+      { xs: t, ys: t.map(v => st.I * Math.cos(w * v) - st.Q * Math.sin(w * v)), label: 'your wave' }],
+      tipSeries: 1, ymin: -1.6, ymax: 1.6, xlabel: 'time',
+      tip: (i, s) => ['t = ' + s.xs[i].toFixed(3), 'x = ' + s.ys[i].toFixed(3)] });
+    const circ = linspace(0, TWO_PI, 120);
+    chC.draw({ series: [
+      { xs: circ.map(Math.cos), ys: circ.map(Math.sin), color: css('--line'), width: 1 },
+      { xs: [0, st.I], ys: [0, st.Q], color: css('--s3'), width: 2 },
+      { xs: [st.I], ys: [st.Q], kind: 'dots', r: 7 }],
+      xmin: -1.35, xmax: 1.35, ymin: -1.35, ymax: 1.35, xlabel: 'I (in-phase)', ylabel: 'Q (quadrature)',
+      tipSeries: 2, tip: () => ['I = ' + st.I.toFixed(2), 'Q = ' + st.Q.toFixed(2), 'height ' + A.toFixed(2)] });
+    ro.set('A', A.toFixed(2));
+    ro.set('phi', (phi * 180 / Math.PI).toFixed(0) + '°');
+    ro.set('bits', st.I >= 0 ? (st.Q >= 0 ? '00' : '10') : (st.Q >= 0 ? '01' : '11'));
+    setEq('x(t) = ' + hi(st.I.toFixed(2)) + ' · cos(ωt) − ' + hi(st.Q.toFixed(2)) + ' · sin(ωt)<br>'
+      + '= ' + hi(A.toFixed(2)) + ' · cos(ωt + ' + hi((phi * 180 / Math.PI).toFixed(0) + '°') + ')  — the same wave, written two ways');
+  }
+  sI = slider(controls, 'I (in-phase)', { min: -1, max: 1, step: 0.01, value: 0.71, fmt: v => v.toFixed(2), on: v => { st.I = v; draw(); } });
+  sQ = slider(controls, 'Q (quadrature)', { min: -1, max: 1, step: 0.01, value: 0.71, fmt: v => v.toFixed(2), on: v => { st.Q = v; draw(); } });
+  segmented(controls, 'QPSK menu', [
+    { label: '00', value: [0.71, 0.71] }, { label: '01', value: [-0.71, 0.71] },
+    { label: '11', value: [-0.71, -0.71] }, { label: '10', value: [0.71, -0.71] }],
+    [0.71, 0.71], v => { st.I = v[0]; st.Q = v[1]; sI.set(v[0]); sQ.set(v[1]); draw(); });
+  draw();
+}});
+
+lab({ id: 'noise', part: 'Part 1', nav: 'Noise & link budget', blurb: 'Will the signal beat the hiss?', build(main) {
+  const p = panel(main, 'Part 1 · What an RF signal is', 'Noise and the link budget: will the signal arrive?',
+    'Every warm object hisses, and a wider channel collects more hiss. The link budget is a sum: transmit power, plus antenna gains, minus the loss through the air. If the answer sits comfortably above the hiss, the link works.');
+  const { controls, out } = labLayout(p);
+  const st = { ptx: 20, d: 50, f: 2400, bw: 20, nf: 5 };
+  const ro = readouts(out, [{ key: 'fspl', label: 'loss through the air' }, { key: 'prx', label: 'received power' },
+    { key: 'floor', label: 'noise floor of the receiver' }, { key: 'snr', label: 'signal above the hiss', cls: 'accent' }]);
+  const ch = makeChart(out, 'Received power against distance, with the noise floor', 240);
+  const verdict = el('div', 'chart'); out.appendChild(verdict);
+  const setEq = below(p, 'Shouting across a field: how loud you shout, minus how much the sound fades on the way, plus how good the listener’s ears are, is what they hear. If that is above the wind noise, the message gets through.',
+    ['Double the distance: the loss rises by exactly 6 dB, every time.',
+     'Switch from 2.4 GHz to 5.8 GHz at the same distance: another 7.7 dB gone. That is why 5 GHz Wi-Fi has shorter range.',
+     'Widen the channel from 20 to 80 MHz: the noise floor rises 6 dB, so the same signal has 6 dB less to spare.']);
+  const fspl = (dkm, fmhz) => 20 * Math.log10(dkm) + 20 * Math.log10(fmhz) + 32.44;
+  function draw() {
+    const L = fspl(st.d / 1000, st.f), prx = st.ptx + 4 - L;
+    const floor = -174 + 10 * Math.log10(st.bw * 1e6) + st.nf, snr = prx - floor;
+    ro.set('fspl', '−' + fmt.n(L) + ' dB');
+    ro.set('prx', fmt.n(prx) + ' dBm');
+    ro.set('floor', fmt.n(floor) + ' dBm');
+    ro.set('snr', fmt.n(snr) + ' dB', snr > 20 ? 'good' : snr > 10 ? '' : 'bad');
+    const ds = linspace(1, 1000, 300);
+    ch.draw({ series: [
+      { xs: ds, ys: ds.map(d => st.ptx + 4 - fspl(d / 1000, st.f)), label: 'received power' },
+      { xs: ds, ys: ds.map(() => floor), label: 'noise floor', color: css('--s2') },
+      { xs: [st.d], ys: [prx], kind: 'dots', r: 6, color: css('--s3') }],
+      xlabel: 'distance (metres)', ylabel: 'dBm', ymin: -130, ymax: 0,
+      tip: (i, s) => [s.xs[i].toFixed(0) + ' m', s.ys[i].toFixed(1) + ' dBm', 'margin ' + (s.ys[i] - floor).toFixed(1) + ' dB'] });
+    verdict.innerHTML = '<div class="t">Verdict</div><span class="pill ' + (snr > 20 ? 'good' : 'bad') + '">'
+      + (snr > 20 ? 'Comfortable link' : snr > 10 ? 'Marginal: expect the slowest data rates' : 'Link fails: the signal is buried in the hiss')
+      + '</span> <span style="color:var(--muted);font-size:12.5px">Wi-Fi needs roughly 10 dB for its slowest rate and 25 dB or more for its fastest.</span>';
+    setEq('loss = 20 log₁₀(' + (st.d / 1000).toFixed(3) + ' km) + 20 log₁₀(' + st.f + ' MHz) + 32.44 = ' + hi(fmt.n(L) + ' dB') + '<br>'
+      + 'received = ' + st.ptx + ' + 4 − ' + fmt.n(L) + ' = ' + hi(fmt.n(prx) + ' dBm') + '<br>'
+      + 'floor = −174 + 10 log₁₀(' + st.bw + ' MHz) + ' + st.nf + ' = ' + hi(fmt.n(floor) + ' dBm')
+      + '  →  margin ' + hi(fmt.n(snr) + ' dB'));
+  }
+  slider(controls, 'Transmit power', { min: 0, max: 30, step: 1, value: 20, fmt: v => '+' + v + ' dBm', on: v => { st.ptx = v; draw(); } });
+  slider(controls, 'Distance', { min: 0, max: 3, step: 0.02, value: 50, log: true, fmt: v => fmt.si(v, 'm', 3), on: v => { st.d = v; draw(); } });
+  segmented(controls, 'Band', [{ label: '900 MHz', value: 900 }, { label: '2.4 GHz', value: 2400 }, { label: '5.8 GHz', value: 5800 }, { label: '28 GHz', value: 28000 }], 2400, v => { st.f = v; draw(); });
+  segmented(controls, 'Channel width', [{ label: '1', value: 1 }, { label: '20', value: 20 }, { label: '80', value: 80 }, { label: '400 MHz', value: 400 }], 20, v => { st.bw = v; draw(); });
+  slider(controls, 'Receiver noise figure', { min: 1, max: 12, step: 0.5, value: 5, fmt: v => v + ' dB', on: v => { st.nf = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'sampling', part: 'Part 2', nav: 'Sampling & aliasing', blurb: 'How often is often enough?', build(main) {
+  const p = panel(main, 'Part 2 · Sampling', 'Sampling and aliasing: how often is often enough?',
+    'A computer cannot store a smooth curve, only readings taken at a fixed rate. Read more than twice per wiggle and nothing is lost. Read too slowly and a fast wave disguises itself as a slow one — and once that has happened, no algorithm can undo it.');
+  const { controls, out } = labLayout(p);
+  const st = { f: 1, fs: 12 };
+  const ch = makeChart(out, 'The real wave, the readings, and what the computer thinks it saw', 260);
+  const ro = readouts(out, [{ key: 'ny', label: 'highest frequency this rate can hold' }, { key: 'alias', label: 'frequency the computer reports', cls: 'accent' }, { key: 'per', label: 'readings per wiggle' }]);
+  const verdict = el('div', 'chart'); out.appendChild(verdict);
+  const setEq = below(p, 'Wagon wheels in old films spin backwards because the camera, at 24 pictures a second, is too slow for the spokes. A clock glanced at once every eleven hours looks like it runs backwards too.',
+    ['Leave the wave at 1 kHz and slide the rate down to 1.5 kSPS. The readings now fit a slower wave, and nothing warned you.',
+     'Set the wave to 9 kHz and the rate to 8 kSPS: the readings are identical to a 1 kHz wave.',
+     'Find the lowest rate at which the coral wave and the readings still agree everywhere.']);
+  let sF, sFs;
+  function draw() {
+    const span = 3;
+    const t = linspace(0, span, 700);
+    const n = Math.floor(span * st.fs);
+    const ts = Array.from({ length: n + 1 }, (_, i) => i / st.fs);
+    const r = st.f % st.fs, falias = Math.min(r, st.fs - r), ok = st.fs > 2 * st.f;
+    const series = [{ xs: t, ys: t.map(v => Math.cos(TWO_PI * st.f * v)), label: 'real wave, ' + st.f.toFixed(1) + ' kHz', color: css('--s2') }];
+    if (!ok) series.push({ xs: t, ys: t.map(v => Math.cos(TWO_PI * falias * v)), label: 'what the computer sees, ' + falias.toFixed(2) + ' kHz', color: css('--s1') });
+    series.push({ xs: ts, ys: ts.map(v => Math.cos(TWO_PI * st.f * v)), kind: 'stem', label: 'readings at ' + st.fs.toFixed(1) + ' kSPS', color: css('--ink') });
+    ch.draw({ series, tipSeries: series.length - 1, ymin: -1.25, ymax: 1.25, xlabel: 'time (milliseconds)',
+      tip: (i, s) => ['reading ' + i, 't = ' + s.xs[i].toFixed(3) + ' ms', 'value ' + s.ys[i].toFixed(3)] });
+    ro.set('ny', fmt.n(st.fs / 2, 2) + ' kHz');
+    ro.set('alias', fmt.n(ok ? st.f : falias, 2) + ' kHz', ok ? 'good' : 'bad');
+    ro.set('per', fmt.n(st.fs / st.f, 1));
+    verdict.innerHTML = '<div class="t">Nyquist check</div><span class="pill ' + (ok ? 'good' : 'bad') + '">'
+      + (ok ? 'Safe: ' + st.fs.toFixed(1) + ' is more than 2 × ' + st.f.toFixed(1)
+            : 'Aliased: ' + st.fs.toFixed(1) + ' is not more than 2 × ' + st.f.toFixed(1) + ', so the tone is reported as ' + falias.toFixed(2) + ' kHz') + '</span>';
+    setEq('the rule: f_s &gt; 2 · f  →  ' + hi(st.fs.toFixed(1)) + (ok ? ' &gt; ' : ' ≤ ') + hi((2 * st.f).toFixed(1)) + ' kHz<br>'
+      + (ok ? 'no disguise: only one smooth wave fits these readings'
+            : 'disguise: |f − k·f_s| = |' + st.f.toFixed(1) + ' − ' + Math.round(st.f / st.fs) + '·' + st.fs.toFixed(1) + '| = ' + hi(falias.toFixed(2) + ' kHz')));
+  }
+  sF = slider(controls, 'Wave frequency', { min: 0.2, max: 10, step: 0.1, value: 1, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f = v; draw(); } });
+  sFs = slider(controls, 'Sample rate', { min: 1, max: 24, step: 0.5, value: 12, fmt: v => v.toFixed(1) + ' kSPS', on: v => { st.fs = v; draw(); } });
+  segmented(controls, 'Presets', [
+    { label: 'Comfortable', value: [1, 12] }, { label: 'Just enough', value: [1, 2.5] }, { label: '9 kHz at 8 kSPS', value: [9, 8] }],
+    [1, 12], v => { st.f = v[0]; st.fs = v[1]; sF.set(v[0]); sFs.set(v[1]); draw(); });
+  draw();
+}});
+
+lab({ id: 'quant', part: 'Part 3', nav: 'Quantisation & bits', blurb: 'A ruler with 2ᴺ marks, and the 6 dB rule.', build(main) {
+  const p = panel(main, 'Part 3 · Inside the ADC', 'Quantisation: a ruler with 2ᴺ marks',
+    'The ADC compares the frozen voltage with a ruler that has 2ᴺ marks and writes down the nearest one. The rounding is never worse than half a step, and on a busy signal it behaves like a little extra hiss. Every bit you add halves the step and buys about 6 dB.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 3, amp: 0.9 };
+  const two = el('div', 'two'); out.appendChild(two);
+  const chT = makeChart(two, 'Input (grey) and what the ADC writes down', 225);
+  const chE = makeChart(two, 'The rounding error, reading by reading', 225);
+  const ro = readouts(out, [{ key: 'lvl', label: 'marks on the ruler, 2ᴺ' }, { key: 'lsb', label: 'one step, over a 2 V range' },
+    { key: 'snr', label: 'ideal SNR = 6.02N + 1.76', cls: 'accent' }, { key: 'meas', label: 'SNR measured on this wave' }]);
+  const setEq = below(p, 'A ruler marked only in whole centimetres: a person 173.6 cm tall is written down as 174. Add millimetre marks and the error shrinks tenfold. The rounding is as often up as down, so over many readings it behaves like random hiss.',
+    ['Go from 3 to 4 bits: the steps halve and the measured SNR climbs by about 6 dB.',
+     'At 3 bits, drop the wave height to 0.1. The error stops looking random and the SNR collapses — small signals suffer most.',
+     'At 12 bits the staircase is invisible. That is why 12 bits is the usual choice for radio.']);
+  function draw() {
+    const N = 256, t = [], x = [], q = [], e = [];
+    for (let i = 0; i < N; i++) { t.push(i); const v = st.amp * Math.sin(TWO_PI * 3.37 * i / N); x.push(v); const qq = quantize(v, st.bits, 2); q.push(qq); e.push(v - qq); }
+    const ps = x.reduce((a, v) => a + v * v, 0) / N, pe = e.reduce((a, v) => a + v * v, 0) / N;
+    const meas = 10 * Math.log10(ps / Math.max(pe, 1e-30)), lsb = 2 / 2 ** st.bits;
+    chT.draw({ series: [{ xs: t, ys: x, label: 'input', color: css('--muted'), width: 1.5 }, { xs: t, ys: q, kind: 'step', label: st.bits + '-bit output' }],
+      tipSeries: 1, ymin: -1.05, ymax: 1.05, xlabel: 'reading n', ylabel: 'volts',
+      tip: i => ['reading ' + i, 'in  ' + x[i].toFixed(4) + ' V', 'out ' + q[i].toFixed(4) + ' V', 'mark ' + Math.round(q[i] / lsb)] });
+    chE.draw({ series: [{ xs: t, ys: e, color: css('--s2'), width: 1.5 }],
+      ymin: -lsb * 0.62, ymax: lsb * 0.62, xlabel: 'reading n', ylabel: 'error (V)', yfmt: v => v.toFixed(3),
+      tip: (i, s) => ['reading ' + i, 'error ' + s.ys[i].toFixed(4) + ' V', '= ' + (s.ys[i] / lsb).toFixed(2) + ' steps'] });
+    ro.set('lvl', fmt.int(2 ** st.bits));
+    ro.set('lsb', fmt.si(lsb, 'V'));
+    ro.set('snr', fmt.n(snrBits(st.bits)) + ' dB');
+    ro.set('meas', fmt.n(meas) + ' dB', meas > snrBits(st.bits) - 3 ? 'good' : 'bad');
+    setEq('one step = 2 V / 2^' + hi(st.bits) + ' = ' + hi(fmt.si(lsb, 'V')) + '<br>'
+      + 'error power = step² / 12, so the error is never more than half a step<br>'
+      + 'SNR = 6.02 · ' + st.bits + ' + 1.76 = ' + hi(fmt.n(snrBits(st.bits)) + ' dB') + ' for a full-size wave');
+  }
+  slider(controls, 'Bits N', { min: 1, max: 12, step: 1, value: 3, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Wave height, of full scale', { min: 0.05, max: 1, step: 0.05, value: 0.9, fmt: v => v.toFixed(2), on: v => { st.amp = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'sar', part: 'Part 3', nav: 'SAR: the guessing game', blurb: 'One bit per clock tick, step by step.', build(main) {
+  const p = panel(main, 'Part 3 · Inside the ADC', 'SAR ADC: the guessing game, one bit per tick',
+    'The most common ADC finds the answer by playing a guessing game. Tick one: try half of full scale; is the input above it? Keep that bit. Tick two: add a quarter and try again. After N ticks the number is complete. Press "Next tick" and watch it close in.');
+  const { controls, out } = labLayout(p);
+  const st = { vin: 0.7, bits: 8, tick: 8 };
+  const ch = makeChart(out, 'Where each guess lands', 240);
+  const ro = readouts(out, [{ key: 'code', label: 'the number so far, in binary', cls: 'accent' }, { key: 'dec', label: 'as a decimal number' },
+    { key: 'v', label: 'the voltage it stands for' }, { key: 'err', label: 'how far off it still is' }]);
+  const tblWrap = el('div', 'chart'); out.appendChild(tblWrap);
+  const setEq = below(p, 'Guess my number between 0 and 255 and I will only answer "higher" or "lower". Start at 128, then jump 64 up or down, then 32, and so on. Eight questions are always enough — which is exactly N ticks for N bits.',
+    ['Press "Replay from the start", then step tick by tick and watch the error halve every time.',
+     'Set the input to exactly 0.500: the very first guess is right and every later bit is 0.',
+     'Switch to 4 bits: only four ticks, but the final answer can be sixteen times further out.']);
+  let next;
+  function draw() {
+    const res = sarSteps(st.vin, st.bits), shown = res.steps.slice(0, st.tick);
+    ch.draw({ series: [
+      { xs: [0.5, st.bits + 0.5], ys: [st.vin, st.vin], label: 'the input', color: css('--s2'), width: 1.5 },
+      { xs: shown.map(s => s.cycle), ys: shown.map(s => s.trial), label: 'the guess', dots: true, color: css('--s4') },
+      { xs: shown.map(s => s.cycle), ys: shown.map(s => s.codeAfter / 2 ** st.bits), label: 'kept so far', dots: true, color: css('--s1') }],
+      tipSeries: 1, xmin: 0.5, xmax: st.bits + 0.5, xticks: st.bits, xfmt: v => Number.isInteger(v) ? 'tick ' + v : '',
+      ymin: 0, ymax: 1, ylabel: 'fraction of full scale',
+      tip: i => { const s = shown[i]; return s ? ['tick ' + s.cycle, 'guess ' + s.trial.toFixed(4), s.keep ? 'input is above → keep a 1' : 'input is below → keep a 0'] : []; } });
+    const codeStr = res.steps.map((s, i) => i < st.tick ? (s.keep ? '1' : '0') : '·').join('');
+    const codeNow = st.tick ? shown[st.tick - 1].codeAfter : 0, vNow = codeNow / 2 ** st.bits;
+    ro.set('code', codeStr);
+    ro.set('dec', String(codeNow));
+    ro.set('v', vNow.toFixed(4));
+    ro.set('err', (st.vin - vNow).toFixed(4), st.tick === st.bits ? 'good' : '');
+    tblWrap.innerHTML = '<div class="t">Every decision</div><div class="tablewrap"><table class="steps">'
+      + '<tr><th>Tick</th><th>Guess</th><th>Input above it?</th><th>Bit</th><th>Number so far</th></tr>'
+      + res.steps.map((s, i) => '<tr class="' + (i === st.tick - 1 ? 'now' : '') + '"' + (i >= st.tick ? ' style="opacity:.34"' : '') + '>'
+        + '<td>' + s.cycle + '</td><td class="m">' + s.trial.toFixed(4) + '</td>'
+        + '<td>' + (i < st.tick ? (s.keep ? 'yes' : 'no') : '–') + '</td>'
+        + '<td class="m">' + (i < st.tick ? (s.keep ? 1 : 0) : '·') + '</td>'
+        + '<td class="m">' + (i < st.tick ? (s.codeAfter / 2 ** st.bits).toFixed(4) : '–') + '</td></tr>').join('')
+      + '</table></div>';
+    setEq('after ' + hi(st.tick) + ' of ' + st.bits + ' ticks the number is ' + hi(codeStr) + '<br>'
+      + 'voltage = ' + codeNow + ' / ' + 2 ** st.bits + ' = ' + hi(vNow.toFixed(4)) + '  (the input is ' + st.vin.toFixed(4) + ')<br>'
+      + 'once finished the error is always under one step, 1/' + 2 ** st.bits + ' = ' + (1 / 2 ** st.bits).toFixed(4));
+    next[0].disabled = st.tick >= st.bits;
+  }
+  slider(controls, 'Input, as a fraction of full scale', { min: 0, max: 0.999, step: 0.001, value: 0.7, fmt: v => v.toFixed(3), on: v => { st.vin = v; st.tick = st.bits; draw(); } });
+  segmented(controls, 'Bits', [{ label: '4', value: 4 }, { label: '6', value: 6 }, { label: '8', value: 8 }], 8, v => { st.bits = v; st.tick = v; draw(); });
+  next = buttons(controls, [
+    { label: 'Next tick ▸', on: () => { if (st.tick < st.bits) { st.tick++; draw(); } } },
+    { label: 'Replay from the start', ghost: true, on: () => { st.tick = 0; draw(); } },
+    { label: 'Run all', ghost: true, on: () => { st.tick = st.bits; draw(); } }]);
+  draw();
+}});
+
+lab({ id: 'jitter', part: 'Part 3', nav: 'Timing wobble', blurb: 'Why fast signals quietly lose bits.', build(main) {
+  const p = panel(main, 'Part 3 · Inside the ADC', 'Timing wobble: the hidden limit at high frequencies',
+    'The switch that freezes the voltage never opens at exactly the same instant twice; the wobble is called jitter. A fast-moving input travels a long way during that wobble, so the frozen value is wrong. Above a certain frequency the wobble, not the bit count, decides your accuracy.');
+  const { controls, out } = labLayout(p);
+  const st = { f: 1e7, tj: 1e-12, bits: 12 };
+  const ch = makeChart(out, 'Best possible accuracy against input frequency', 250);
+  const ro = readouts(out, [{ key: 'j', label: 'limit set by the wobble' }, { key: 'q', label: 'limit set by your bits' },
+    { key: 'enob', label: 'bits you actually get', cls: 'accent' }, { key: 'need', label: 'wobble needed to keep all your bits' }]);
+  const setEq = below(p, 'Photographing a sprinter: if the shutter fires a fraction late you capture a different position. The faster the runner — the higher the input frequency — the bigger the error from exactly the same timing slip.',
+    ['At 10 MHz with 1 ps of wobble, a 12-bit ADC keeps all its bits. Slide the input to 200 MHz and watch it fall below 10.',
+     'Ten times more wobble, or ten times the frequency, costs 20 dB — about three and a third bits.',
+     'Ask for 14 bits at 1 GHz and read off the wobble you would need: around 30 femtoseconds. That is why fast ADC clocks are expensive.']);
+  function draw() {
+    const fs = linspace(6, 9.3, 220).map(v => 10 ** v);
+    const jl = jitterSnr(st.f, st.tj), ql = snrBits(st.bits);
+    const tot = -10 * Math.log10(10 ** (-jl / 10) + 10 ** (-ql / 10)), enob = (tot - 1.76) / 6.02;
+    const need = 1 / (TWO_PI * st.f * 10 ** (ql / 20));
+    ch.draw({ series: [
+      { xs: fs.map(Math.log10), ys: fs.map(f => jitterSnr(f, st.tj)), label: 'wobble limit, ' + fmt.si(st.tj, 's', 2) },
+      { xs: fs.map(Math.log10), ys: fs.map(() => ql), label: st.bits + '-bit limit', color: css('--s2') },
+      { xs: [Math.log10(st.f)], ys: [Math.min(jl, ql)], kind: 'dots', r: 6, color: css('--s3') }],
+      xmin: 6, xmax: 9.3, xticks: 4, xfmt: v => fmt.si(10 ** v, 'Hz', 2), ymin: 20, ymax: 120, ylabel: 'SNR (dB)',
+      tip: (i, s) => [fmt.si(10 ** s.xs[i], 'Hz', 3), 'wobble limit ' + s.ys[i].toFixed(1) + ' dB'] });
+    ro.set('j', fmt.n(jl) + ' dB');
+    ro.set('q', fmt.n(ql) + ' dB');
+    ro.set('enob', fmt.n(enob) + ' bits', enob >= st.bits - 0.5 ? 'good' : 'bad');
+    ro.set('need', fmt.si(need, 's', 2));
+    setEq('limit = −20 log₁₀(2π · ' + hi(fmt.si(st.f, 'Hz')) + ' · ' + hi(fmt.si(st.tj, 's', 2)) + ') = ' + hi(fmt.n(jl) + ' dB') + '<br>'
+      + 'your bits give 6.02 · ' + st.bits + ' + 1.76 = ' + fmt.n(ql) + ' dB; the worse of the two wins<br>'
+      + 'together: ' + fmt.n(tot) + ' dB, which is ' + hi(fmt.n(enob) + ' real bits'));
+  }
+  slider(controls, 'Input frequency', { min: 6, max: 9.3, step: 0.05, value: 1e7, log: true, fmt: v => fmt.si(v, 'Hz', 3), on: v => { st.f = v; draw(); } });
+  slider(controls, 'Clock wobble', { min: -14, max: -10.5, step: 0.1, value: 1e-12, log: true, fmt: v => fmt.si(v, 's', 2), on: v => { st.tj = v; draw(); } });
+  segmented(controls, 'ADC bits', [{ label: '8', value: 8 }, { label: '12', value: 12 }, { label: '14', value: 14 }, { label: '16', value: 16 }], 12, v => { st.bits = v; draw(); });
+  draw();
+}});
+
+lab({ id: 'fft', part: 'Part 4', nav: 'FFT explorer', blurb: 'Build a signal, watch its spectrum.', build(main) {
+  const p = panel(main, 'Part 4 · FFT and IFFT', 'FFT explorer: from readings to frequencies',
+    'The FFT sorts N readings into N frequency buckets. Build a signal from two tones and some hiss, choose how many readings to take, and decide whether to fade the ends. Hover the spectrum to read any bucket. Watch how bucket width depends on the recording length and nothing else.');
+  const { controls, out } = labLayout(p);
+  const fs = 256;
+  const st = { f1: 30, a1: 1, f2: 75, a2: 0.3, noise: 0.05, N: 256, win: 'none' };
+  const chT = makeChart(out, 'The readings, in time (first 128 shown)', 175);
+  const chF = makeChart(out, 'The spectrum after the FFT', 250);
+  const ro = readouts(out, [{ key: 'df', label: 'width of one bucket', cls: 'accent' }, { key: 'b1', label: 'bucket of tone 1' },
+    { key: 'b2', label: 'bucket of tone 2' }, { key: 'pg', label: 'how far the FFT pushes the hiss down' }]);
+  const setEq = below(p, 'A piano chord is one messy pressure wave in the air but three clear notes on the page. The FFT is the trained ear that hears the notes inside the mess. Fading the recording in and out stops the sharp cut at each end from smearing across the notes.',
+    ['Set tone 1 to 30.5 kHz with no window: the peak grows wide skirts. Switch on the Hann window and they collapse.',
+     'Raise N from 256 to 1024: the buckets get four times narrower and the hiss floor drops another 6 dB.',
+     'Turn tone 2 down to 0.02 and see whether you can still find it with the window on, then off.']);
+  function draw() {
+    const N = st.N, next = rng(11), x = [];
+    for (let n = 0; n < N; n++) x.push(st.a1 * Math.cos(TWO_PI * st.f1 * n / fs) + st.a2 * Math.cos(TWO_PI * st.f2 * n / fs + 0.7) + st.noise * gaussian(next));
+    const w = st.win === 'hann' ? hann(N) : null;
+    const xw = w ? x.map((v, i) => v * w[i]) : x, cg = w ? 0.5 : 1;
+    const X = fft(xw, new Array(N).fill(0)), mag = [], kf = [], df = fs / N;
+    for (let k = 0; k < N / 2; k++) { mag.push(20 * Math.log10(Math.max(Math.hypot(X.re[k], X.im[k]) / (N / 2 * cg), 1e-9))); kf.push(k * df); }
+    chT.draw({ series: [{ xs: x.slice(0, 128).map((_, i) => i), ys: x.slice(0, 128), color: css('--muted'), width: 1.5 }],
+      ymin: -2, ymax: 2, xlabel: 'reading n', tip: (i, s) => ['reading ' + i, s.ys[i].toFixed(3)] });
+    chF.draw({ series: [{ xs: kf, ys: mag, width: 1.5 }], ymin: -100, ymax: 5,
+      xlabel: 'frequency (kHz), sampled at 256 kSPS', ylabel: 'dB below full scale',
+      tip: (i, s) => ['bucket ' + i, s.xs[i].toFixed(2) + ' kHz', s.ys[i].toFixed(1) + ' dB'] });
+    ro.set('df', fmt.n(df, 3) + ' kHz');
+    ro.set('b1', (st.f1 / df).toFixed(2));
+    ro.set('b2', (st.f2 / df).toFixed(2));
+    ro.set('pg', fmt.n(10 * Math.log10(N / 2)) + ' dB');
+    const whole = Math.abs(st.f1 / df - Math.round(st.f1 / df)) < 1e-6;
+    setEq('bucket width = f_s / N = 256 / ' + hi(N) + ' = ' + hi(fmt.n(df, 3) + ' kHz') + '<br>'
+      + 'tone 1 sits in bucket ' + st.f1 + ' / ' + fmt.n(df, 3) + ' = ' + hi((st.f1 / df).toFixed(2))
+      + (whole ? ' — a whole number, so no smearing' : ' — not a whole number, so it smears unless you use a window') + '<br>'
+      + 'X[k] = Σ x[n] · e^(−j2πkn/N),  k = 0 … ' + (N - 1));
+  }
+  slider(controls, 'Tone 1 frequency', { min: 1, max: 120, step: 0.5, value: 30, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f1 = v; draw(); } });
+  slider(controls, 'Tone 1 height', { min: 0, max: 1, step: 0.02, value: 1, fmt: v => v.toFixed(2), on: v => { st.a1 = v; draw(); } });
+  slider(controls, 'Tone 2 frequency', { min: 1, max: 120, step: 0.5, value: 75, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f2 = v; draw(); } });
+  slider(controls, 'Tone 2 height', { min: 0, max: 1, step: 0.02, value: 0.3, fmt: v => v.toFixed(2), on: v => { st.a2 = v; draw(); } });
+  slider(controls, 'Hiss level', { min: 0, max: 0.3, step: 0.01, value: 0.05, fmt: v => v.toFixed(2), on: v => { st.noise = v; draw(); } });
+  segmented(controls, 'Readings N', [{ label: '64', value: 64 }, { label: '256', value: 256 }, { label: '1024', value: 1024 }], 256, v => { st.N = v; draw(); });
+  segmented(controls, 'Fade the ends?', [{ label: 'No window', value: 'none' }, { label: 'Hann window', value: 'hann' }], 'none', v => { st.win = v; draw(); });
+  draw();
+}});
+
+lab({ id: 'butterfly', part: 'Part 4', nav: 'Why the FFT is fast', blurb: 'Split, solve, stitch — and the work it saves.', build(main) {
+  const p = panel(main, 'Part 4 · FFT and IFFT', 'Why the FFT is fast: split, solve, stitch',
+    'The plain method multiplies every reading by every test wave: N × N operations. The FFT notices that the even and odd readings can be solved separately and stitched together with one multiply each. Do that again and again and N² becomes (N/2) · log₂N. Slide N and feel the difference.');
+  const { controls, out } = labLayout(p);
+  const st = { logN: 10 };
+  const ro = readouts(out, [{ key: 'dft', label: 'plain method: N² multiplies' }, { key: 'fft', label: 'FFT: (N/2) · log₂N steps', cls: 'accent' },
+    { key: 'ratio', label: 'times less work' }, { key: 'time', label: 'FFT time at 1 ns per step' }]);
+  const ch = makeChart(out, 'Work against number of readings', 250);
+  const setEq = below(p, 'Sorting a deck of cards by splitting it in half, sorting each half, then merging. The FFT does the same with frequencies. Nothing is approximated: the answer is exactly what the slow method gives, only reached far sooner.',
+    ['At N = 8 it is 64 multiplies against 12 steps — three rounds of four.',
+     'At N = 1024 it is over a million against about five thousand. That 200-fold saving is what makes real-time radio possible.',
+     'A 5G receiver runs a 4096-point FFT thousands of times a second. Without this trick it would need roughly 700 times the silicon.']);
+  function draw() {
+    const N = 2 ** st.logN, dft = N * N, f = N / 2 * st.logN;
+    ro.set('dft', fmt.int(dft));
+    ro.set('fft', fmt.int(f));
+    ro.set('ratio', fmt.n(dft / f, 0) + ' ×');
+    ro.set('time', fmt.si(f * 1e-9, 's'));
+    const ks = Array.from({ length: 14 }, (_, i) => i + 3);
+    ch.draw({ series: [
+      { xs: ks, ys: ks.map(k => 2 * k * Math.log10(2)), label: 'plain method N²', color: css('--s2'), dots: true },
+      { xs: ks, ys: ks.map(k => Math.log10(2 ** k / 2 * k)), label: 'FFT (N/2) log₂N', dots: true },
+      { xs: [st.logN], ys: [Math.log10(f)], kind: 'dots', r: 7, color: css('--s3') }],
+      xmin: 3, xmax: 16.5, xticks: 7, xfmt: v => Number.isInteger(v) ? fmt.si(2 ** v, '', 2) : '',
+      ymin: 0, ymax: 10, yfmt: v => v === 0 ? '1' : '10^' + v, ylabel: 'operations',
+      xlabel: 'number of readings N', tipSeries: 1,
+      tip: i => ['N = ' + fmt.int(2 ** ks[i]), 'plain: ' + fmt.int(4 ** ks[i]), 'FFT:   ' + fmt.int(2 ** ks[i] / 2 * ks[i])] });
+    setEq('N = 2^' + hi(st.logN) + ' = ' + hi(fmt.int(N)) + '<br>'
+      + 'plain: N² = ' + hi(fmt.int(dft)) + '  ·  FFT: (N/2) · log₂N = ' + fmt.int(N / 2) + ' · ' + st.logN + ' = ' + hi(fmt.int(f)) + '<br>'
+      + 'each step: top = a + W·b, bottom = a − W·b — one multiply, two adds');
+  }
+  slider(controls, 'Readings N', { min: 3, max: 16, step: 1, value: 10, fmt: v => 'N = ' + fmt.int(2 ** v), on: v => { st.logN = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'ifft', part: 'Part 4', nav: 'IFFT: build a filter', blurb: 'Switch off a bucket, watch the hum vanish.', build(main) {
+  const p = panel(main, 'Part 4 · FFT and IFFT', 'IFFT: back to readings, and a filter for free',
+    'The IFFT turns frequency buckets back into readings, exactly. Change the buckets on the way and you have built a filter. Below, a slow signal has a hum sitting on top of it. Switch the hum’s bucket off and look at what comes back.');
+  const { controls, out } = labLayout(p);
+  const N = 64;
+  const st = { humAmp: 0.6, humBin: 12, mask: new Array(N / 2).fill(true) };
+  const two = el('div', 'two'); out.appendChild(two);
+  const chIn = makeChart(two, 'Original readings: signal plus hum', 210);
+  const chOut = makeChart(two, 'Rebuilt by the IFFT after your edits', 210);
+  const chS = makeChart(out, 'The buckets — click any square below to switch one off', 185);
+  const binsEl = el('div', 'bins'); out.appendChild(binsEl);
+  const ro = readouts(out, [{ key: 'kept', label: 'buckets left switched on' }, { key: 'err', label: 'round-trip error with none switched off', cls: 'accent' },
+    { key: 'hum', label: 'hum left in the output' }]);
+  const setEq = below(p, 'If the FFT is the recipe listing how much of each ingredient is in a cake, the IFFT bakes the cake again from the recipe. Leave one ingredient out of the list and you get the same cake without it.',
+    ['Press "Switch off the hum bucket": the output is the clean signal.',
+     'Instead switch off the low buckets 2, 3 and 5: the signal vanishes and only the hum survives. You just built a high-pass filter.',
+     'Switch everything back on: the output matches the input to about sixteen decimal places.']);
+  function signal() {
+    const next = rng(3), x = [];
+    for (let n = 0; n < N; n++) x.push(0.8 * Math.sin(TWO_PI * 2 * n / N) + 0.4 * Math.sin(TWO_PI * 3 * n / N + 1)
+      + 0.25 * Math.sin(TWO_PI * 5 * n / N + 2) + st.humAmp * Math.sin(TWO_PI * st.humBin * n / N) + 0.02 * (next() - 0.5));
+    return x;
+  }
+  function draw() {
+    const x = signal(), X = fft(x, new Array(N).fill(0));
+    const Yr = X.re.slice(), Yi = X.im.slice();
+    for (let k = 0; k < N / 2; k++) if (!st.mask[k]) { Yr[k] = 0; Yi[k] = 0; if (k > 0) { Yr[N - k] = 0; Yi[N - k] = 0; } }
+    const y = ifft(Yr, Yi), full = ifft(X.re.slice(), X.im.slice());
+    let err = 0; for (let i = 0; i < N; i++) err = Math.max(err, Math.abs(full.re[i] - x[i]));
+    const n = Array.from({ length: N }, (_, i) => i), mag = [];
+    for (let k = 0; k < N / 2; k++) mag.push(Math.hypot(X.re[k], X.im[k]) / (N / 2));
+    chIn.draw({ series: [{ xs: n, ys: x, color: css('--muted') }], ymin: -2, ymax: 2, xlabel: 'reading n', tip: (i, s) => ['reading ' + i, s.ys[i].toFixed(3)] });
+    chOut.draw({ series: [{ xs: n, ys: y.re }], ymin: -2, ymax: 2, xlabel: 'reading n', tip: (i, s) => ['reading ' + i, s.ys[i].toFixed(3)] });
+    chS.draw({ series: [{ xs: mag.map((_, k) => k), ys: mag.map((m, k) => st.mask[k] ? m : 0), kind: 'bar' }],
+      xmin: -0.6, xmax: N / 2 - 0.4, ymin: 0, ymax: 1, xlabel: 'bucket k',
+      tip: (i, s) => ['bucket ' + i, 'size ' + s.ys[i].toFixed(3), st.mask[i] ? 'switched on' : 'switched off'] });
+    binsEl.innerHTML = '';
+    for (let k = 0; k < N / 2; k++) {
+      const cls = !st.mask[k] ? 'off' : (k === st.humBin ? 'hum' : (mag[k] > 0.05 ? 'on' : ''));
+      const b = el('button', cls);
+      b.title = 'bucket ' + k + ': ' + (st.mask[k] ? 'on' : 'off');
+      b.setAttribute('aria-label', b.title);
+      b.addEventListener('click', () => { st.mask[k] = !st.mask[k]; draw(); });
+      binsEl.appendChild(b);
+    }
+    const humLeft = st.mask[st.humBin] ? st.humAmp : 0;
+    ro.set('kept', st.mask.filter(Boolean).length + ' of ' + N / 2);
+    ro.set('err', err.toExponential(1));
+    ro.set('hum', humLeft.toFixed(2), humLeft ? 'bad' : 'good');
+    const offList = st.mask.map((m, k) => m ? null : k).filter(v => v !== null);
+    setEq('x[n] = (1/N) · Σ X[k] · e^(+j2πkn/N),  N = ' + N + '<br>'
+      + 'buckets switched off: ' + hi(offList.length ? offList.join(', ') : 'none') + '<br>'
+      + 'with none off, the largest difference is ' + hi(err.toExponential(1)) + ' — the round trip loses nothing');
+  }
+  slider(controls, 'Hum height', { min: 0, max: 1, step: 0.05, value: 0.6, fmt: v => v.toFixed(2), on: v => { st.humAmp = v; draw(); } });
+  slider(controls, 'Which bucket the hum sits in', { min: 8, max: 28, step: 1, value: 12, fmt: v => 'bucket ' + v, on: v => { st.humBin = v; draw(); } });
+  buttons(controls, [
+    { label: 'Switch off the hum bucket', on: () => { st.mask.fill(true); st.mask[st.humBin] = false; draw(); } },
+    { label: 'All buckets on', ghost: true, on: () => { st.mask.fill(true); draw(); } }]);
+  draw();
+}});
+
+lab({ id: 'ofdm', part: 'Part 5', nav: 'OFDM in Wi-Fi', blurb: 'Many slow lanes instead of one fast one.', build(main) {
+  const p = panel(main, 'Part 5 · Putting it together', 'Where the FFT lives: Wi-Fi, LTE and 5G',
+    'Wi-Fi puts one small symbol on each of many frequency buckets, runs an IFFT to make a single waveform, and transmits it. The receiver runs an FFT and the symbols drop straight back out of the buckets. Change how many buckets are used and watch both ends at once.');
+  const { controls, out } = labLayout(p);
+  const N = 64;
+  const st = { used: 52, seed: 7 };
+  const two = el('div', 'two'); out.appendChild(two);
+  const chT = makeChart(two, 'What the IFFT sends: one OFDM symbol', 215);
+  const chR = makeChart(two, 'What the receiver’s FFT gets back', 215);
+  const ro = readouts(out, [{ key: 'sp', label: 'spacing between buckets', cls: 'accent' }, { key: 'bw', label: 'bandwidth actually used' },
+    { key: 'rate', label: 'bits in this one symbol' }, { key: 'papr', label: 'peak above average power' }]);
+  const setEq = below(p, 'Instead of one lorry racing down a single lane, OFDM sends many slow bicycles side by side in many narrow lanes. The IFFT packs them onto one road and the FFT unpacks them at the far end. Because the lanes are exactly FFT buckets they can touch without colliding.',
+    ['Drop to 4 subcarriers: the waveform becomes a simple pattern and the receiver still gets exactly 4 symbols back.',
+     'Go to 52, which is real Wi-Fi 802.11a/g: the waveform now looks like noise. That is normal, and it is why OFDM amplifiers need headroom — see the peak-above-average figure.',
+     'Press "New data" a few times. The symbols change every time; the recovered buckets always match what was sent.']);
+  function draw() {
+    const next = rng(st.seed), txR = new Array(N).fill(0), txI = new Array(N).fill(0);
+    const half = Math.floor(st.used / 2);
+    let bits = 0;
+    for (let k = -half; k <= half; k++) {
+      if (k === 0) continue;
+      const idx = (k + N) % N;
+      txR[idx] = next() < 0.5 ? -1 : 1; txI[idx] = next() < 0.5 ? -1 : 1; bits += 2;
+    }
+    const time = ifft(txR, txI), rx = fft(time.re.slice(), time.im.slice());
+    const n = Array.from({ length: N }, (_, i) => i), scale = 8;
+    const pw = time.re.map((v, i) => v * v + time.im[i] * time.im[i]);
+    const papr = 10 * Math.log10(Math.max.apply(null, pw) / (pw.reduce((a, v) => a + v, 0) / N));
+    chT.draw({ series: [
+      { xs: n, ys: time.re.map(v => v * scale), label: 'real part' },
+      { xs: n, ys: time.im.map(v => v * scale), label: 'imaginary part', color: css('--s4') }],
+      ymin: -3, ymax: 3, xlabel: 'reading n',
+      tip: i => ['reading ' + i, 'real ' + (time.re[i] * scale).toFixed(2), 'imag ' + (time.im[i] * scale).toFixed(2)] });
+    const ks = [], mags = [];
+    for (let k = -N / 2; k < N / 2; k++) { ks.push(k); const idx = (k + N) % N; mags.push(Math.hypot(rx.re[idx], rx.im[idx])); }
+    chR.draw({ series: [{ xs: ks, ys: mags, kind: 'bar', color: css('--s2') }],
+      xmin: -32.6, xmax: 31.6, ymin: 0, ymax: 2, xlabel: 'bucket (subcarrier) number',
+      tip: i => { const idx = (ks[i] + N) % N; return ['bucket ' + ks[i], mags[i] > 0.5 ? 'recovered (' + (txR[idx] > 0 ? '+' : '−') + ', ' + (txI[idx] > 0 ? '+' : '−') + ')' : 'empty, a guard bucket']; } });
+    ro.set('sp', '312.5 kHz');
+    ro.set('bw', fmt.n(bits / 2 * 0.3125, 2) + ' MHz');
+    ro.set('rate', String(bits));
+    ro.set('papr', fmt.n(papr) + ' dB');
+    setEq('transmitter: waveform = IFFT(symbols on ' + hi(bits / 2) + ' of ' + N + ' buckets)<br>'
+      + 'receiver: FFT(waveform) = exactly those symbols again<br>'
+      + 'spacing = 20 MHz / 64 = ' + hi('312.5 kHz') + ', one symbol every 4 µs → ' + hi(fmt.si(bits * 250000, 'bit/s', 3)));
+  }
+  slider(controls, 'Subcarriers used', { min: 2, max: 62, step: 2, value: 52, fmt: v => v + ' of 64', on: v => { st.used = v; draw(); } });
+  buttons(controls, [{ label: 'New data', on: () => { st.seed++; draw(); } }]);
+  draw();
+}});
+
+lab({ id: 'calc', part: 'Part 5', nav: 'Design calculator', blurb: 'A radio tone, all the way to an FFT bucket.', build(main) {
+  const p = panel(main, 'Part 5 · Putting it together', 'The whole chain in one calculator',
+    'Describe a receiver and every number from the talk falls out: the mixed-down frequency, whether the sample rate is fast enough, the bucket width, which bucket the tone lands in, the accuracy your bits allow, and how far the peak stands above the noise. The defaults are the worked example from the deck.');
+  const { controls, out } = labLayout(p);
+  const st = { frf: 2400, flo: 2390, fs: 40, bits: 12, N: 1024, tj: 1e-12 };
+  const ro = readouts(out, [
+    { key: 'fif', label: 'frequency after the mixer' }, { key: 'ny', label: 'fast enough?' },
+    { key: 'df', label: 'bucket width' }, { key: 'bin', label: 'the tone lands in bucket', cls: 'accent' },
+    { key: 'snr', label: 'accuracy your bits allow' }, { key: 'jit', label: 'accuracy the clock allows' },
+    { key: 'floor', label: 'noise floor in the FFT' }, { key: 'margin', label: 'peak above that floor' }]);
+  const ch = makeChart(out, 'What the FFT would show — simulated live from your settings', 250);
+  const setEq = below(p, 'Follow one grain of sand through the whole machine: caught, slowed down, filtered, weighed, and dropped into a bucket. Every number on this page comes from a rule shown earlier.',
+    ['The defaults are the example from the talk: 2.4 GHz down to 10 MHz, 40 MSPS, 12 bits, a 1024-point FFT, landing in bucket 256.',
+     'Move the local oscillator to 2395 MHz: the mixed-down frequency halves to 5 MHz and so does the bucket number.',
+     'Move it to 2375 MHz to ask for a 25 MHz signal at 40 MSPS: the check fails and the peak turns up in the wrong bucket.']);
+  function draw() {
+    const fif = Math.abs(st.frf - st.flo), ok = st.fs > 2 * fif;
+    const df = st.fs * 1e6 / st.N, snr = snrBits(st.bits), jl = jitterSnr(fif * 1e6, st.tj);
+    const floor = -snr - 10 * Math.log10(st.N / 2);
+    const r = fif % st.fs, alias = ok ? fif : Math.min(r, st.fs - r);
+    ro.set('fif', fmt.n(fif, 2) + ' MHz');
+    ro.set('ny', ok ? 'yes' : 'no — folds to ' + alias.toFixed(1) + ' MHz', ok ? 'good' : 'bad');
+    ro.set('df', fmt.si(df, 'Hz', 4));
+    ro.set('bin', (alias * 1e6 / df).toFixed(0));
+    ro.set('snr', fmt.n(snr) + ' dB');
+    ro.set('jit', fmt.n(jl) + ' dB', jl > snr ? 'good' : 'bad');
+    ro.set('floor', fmt.n(floor) + ' dB');
+    ro.set('margin', fmt.n(-floor) + ' dB');
+    const N = Math.min(st.N, 1024), next = rng(5), lsb = 2 / 2 ** st.bits, x = [];
+    for (let n = 0; n < N; n++) {
+      const v = 0.9 * Math.cos(TWO_PI * fif * n / st.fs) + (lsb / Math.sqrt(12)) * gaussian(next);
+      x.push(quantize(v, st.bits, 2));
+    }
+    const w = hann(N), X = fft(x.map((v, i) => v * w[i]), new Array(N).fill(0)), mag = [], kf = [];
+    for (let k = 0; k < N / 2; k++) { mag.push(20 * Math.log10(Math.max(Math.hypot(X.re[k], X.im[k]) / (N / 4), 1e-9))); kf.push(k * st.fs / N); }
+    ch.draw({ series: [{ xs: kf, ys: mag, width: 1.5 }], ymin: -140, ymax: 5,
+      xlabel: 'frequency (MHz)', ylabel: 'dB below full scale',
+      tip: (i, s) => ['bucket ' + i, s.xs[i].toFixed(3) + ' MHz', s.ys[i].toFixed(1) + ' dB'] });
+    setEq('after the mixer: |' + st.frf + ' − ' + st.flo + '| = ' + hi(fmt.n(fif, 2) + ' MHz')
+      + '  ·  check: ' + st.fs + (ok ? ' &gt; ' : ' ≤ ') + '2 × ' + fmt.n(fif, 2) + '<br>'
+      + 'bucket width = ' + st.fs + ' MHz / ' + st.N + ' = ' + hi(fmt.si(df, 'Hz', 4))
+      + '  ·  bucket = ' + fmt.n(alias, 2) + ' MHz ÷ width = ' + hi((alias * 1e6 / df).toFixed(0)) + '<br>'
+      + 'accuracy = 6.02 · ' + st.bits + ' + 1.76 = ' + fmt.n(snr) + ' dB  ·  floor = −' + fmt.n(snr) + ' − 10 log₁₀(' + st.N / 2 + ') = ' + hi(fmt.n(floor) + ' dB'));
+  }
+  slider(controls, 'Radio frequency', { min: 2400, max: 2500, step: 1, value: 2400, fmt: v => v + ' MHz', on: v => { st.frf = v; draw(); } });
+  slider(controls, 'Local oscillator', { min: 2370, max: 2500, step: 1, value: 2390, fmt: v => v + ' MHz', on: v => { st.flo = v; draw(); } });
+  segmented(controls, 'Sample rate', [{ label: '20', value: 20 }, { label: '40', value: 40 }, { label: '80', value: 80 }, { label: '160 MSPS', value: 160 }], 40, v => { st.fs = v; draw(); });
+  segmented(controls, 'ADC bits', [{ label: '8', value: 8 }, { label: '12', value: 12 }, { label: '14', value: 14 }, { label: '16', value: 16 }], 12, v => { st.bits = v; draw(); });
+  segmented(controls, 'FFT size', [{ label: '256', value: 256 }, { label: '1024', value: 1024 }, { label: '4096', value: 4096 }], 1024, v => { st.N = v; draw(); });
+  slider(controls, 'Clock wobble', { min: -13.5, max: -11, step: 0.1, value: 1e-12, log: true, fmt: v => fmt.si(v, 's', 2), on: v => { st.tj = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'quiz', part: 'Check yourself', nav: 'Quiz', blurb: 'Eight questions, answers explained.', build(main) {
+  const p = panel(main, 'Check yourself', 'Eight questions',
+    'Pick an answer and the reason appears straight away, with a link to the lab where you can see it happen.');
+  const Q = [
+    ['A power of 1 mW is how many dBm?', ['−10 dBm', '0 dBm', '+10 dBm'], 1, '1 mW is the reference, so 10 · log₁₀(1) = 0 dBm.', 'db'],
+    ['You sample 100 million times a second. What is the highest frequency you can trust?', ['100 MHz', '50 MHz', '25 MHz'], 1, 'Half the sample rate. Anything faster folds back and arrives disguised.', 'sampling'],
+    ['A 60 MHz tone is sampled at 100 MSPS. Where does it appear?', ['60 MHz', '10 MHz', '40 MHz'], 2, '|60 − 100| = 40 MHz, and the disguise is permanent.', 'sampling'],
+    ['Each extra ADC bit improves the ideal accuracy by about…', ['3 dB', '6 dB', '10 dB'], 1, 'One more bit halves the step, and halving a voltage error is 6 dB.', 'quant'],
+    ['An 8-bit SAR ADC needs how many clock ticks per reading?', ['1', '8', '256'], 1, 'One bit per tick, so eight. A flash ADC needs one tick but 255 comparators.', 'sar'],
+    ['At 40 MSPS with a 1024-point FFT, how wide is one bucket?', ['39.06 kHz', '78.1 kHz', '25 kHz'], 0, '40 000 000 ÷ 1024 = 39 062.5 Hz.', 'fft'],
+    ['Why is the FFT faster than the plain method?', ['It approximates the answer', 'It splits the readings in halves and reuses the shared multiplies', 'It uses fewer readings'], 1, 'Exactly the same answer: N² becomes (N/2) · log₂N by splitting into even and odd readings.', 'butterfly'],
+    ['A strong tone in your spectrum has wide skirts hiding its neighbours. First thing to try?', ['Fewer readings', 'A window, such as Hann', 'A slower sample rate'], 1, 'The skirts come from the sharp cut at each end of the recording; fading the ends removes them.', 'fft'],
+  ];
+  let score = 0, done = 0;
+  const scoreCard = el('div', 'chart', '<div class="t">Score</div><span class="mono" style="font-size:19px">0 of 8</span>');
+  p.appendChild(scoreCard);
+  const wrap = el('div'); p.appendChild(wrap);
+  Q.forEach((q, qi) => {
+    const [text, opts, right, why, link] = q;
+    const box = el('div', 'q');
+    box.appendChild(el('p', null, (qi + 1) + '. ' + text));
+    const o = el('div', 'opts'), whyEl = el('div', 'why');
+    let answered = false;
+    const btns = opts.map((t, i) => {
+      const b = el('button', null, t);
+      b.addEventListener('click', () => {
+        if (answered) return;
+        answered = true; done++;
+        btns.forEach(x => { x.disabled = true; });
+        if (i === right) { score++; b.classList.add('right'); } else { b.classList.add('wrong'); btns[right].classList.add('right'); }
+        whyEl.innerHTML = why + ' <a href="#' + link + '">Open that lab →</a>';
+        scoreCard.querySelector('span').textContent = score + ' of 8'
+          + (done === 8 ? (score >= 7 ? '  ·  excellent' : score >= 5 ? '  ·  solid' : '  ·  worth another pass through the labs') : '');
+      });
+      o.appendChild(b); return b;
+    });
+    box.append(o, whyEl); wrap.appendChild(box);
+  });
+}});
+
+/* ===================== navigation ===================== */
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+let part = null, idx = 0;
+LABS.forEach(l => {
+  if (l.part !== part) { part = l.part; nav.appendChild(el('div', 'nav-part', part)); }
+  const a = el('a', null, '<span class="n">' + (l.id === 'home' ? '⌂' : ++idx) + '</span><span>' + l.nav + '</span>');
+  a.href = '#' + l.id; a.dataset.id = l.id; nav.appendChild(a);
+});
+function show() {
+  const id = (location.hash || '#home').slice(1);
+  const l = LABS.find(x => x.id === id) || LABS[0];
+  charts = [];
+  main.innerHTML = '';
+  l.build(main);
+  nav.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === l.id));
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', show);
+show();
+})();
+</script>
