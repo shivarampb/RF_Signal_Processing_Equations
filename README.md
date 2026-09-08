@@ -17,6 +17,21 @@ can move: change the sample rate and watch a wave get disguised, step a SAR conv
 at a time, switch off an FFT bucket and see the hum disappear. Open `app/index.html` in any browser,
 or run it during the talk instead of clicking through slides.
 
+**Six interface themes**, switchable from the swatches at the top of the sidebar (or the <kbd>T</kbd> key):
+
+| Theme | Character |
+|---|---|
+| Instrument lab | Calibration blue on paper. The only theme that follows the device's light or dark setting |
+| Benchtop | The front panel of a rack instrument: square corners, dense rows, phosphor green |
+| Studio | Bone and charcoal chrome with generous spacing, so the only colour on screen is data |
+| Blueprint | A drawing sheet: navy ground, a real grid behind the page, condensed drafting labels |
+| Daylight | Biggest type, roundest corners, most air. Easiest to read from the back of a room |
+| Chalkboard | The lecture-room look: green board, chalk yellow, handwritten headings |
+
+**Built for presenting**: <kbd>P</kbd> enters presentation mode (sidebar hidden, type enlarged),
+<kbd>←</kbd> <kbd>→</kbd> move between labs, and a ▶ button beside the important sliders sweeps them
+end to end on their own so the room can watch the effect rather than watch you drag.
+
 | File | What it is |
 |---|---|
 | `app/index.html` | **The interactive app**: 13 labs and a quiz, everything computed live in the browser. Open it directly — no server, no build, no dependencies |

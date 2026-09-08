@@ -1,8 +1,25 @@
 <title>RF Signal Lab</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Archivo:wght@500;600;700&family=Nunito:wght@400;600;700&family=Caveat:wght@600;700&display=swap">
 <style>
+  /* ---------------------------------------------------------------------------
+     Six interface themes. The bare :root block is "Instrument lab" in its light
+     form; it is the only theme that follows the reader's light/dark setting.
+     Each named theme below re-declares the whole token set, so it is complete on
+     its own, and sits after the default blocks so an explicit choice always wins.
+     --------------------------------------------------------------------------- */
   :root {
     color-scheme: light;
+    --font-head: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px;
+    --radius: 10px;
+    --radius-sm: 8px;
+    --panel-border: 1px;
+    --label-case: uppercase;
+    --label-space: 0em;
+    --head-scale: 1;
+    --on-accent: #ffffff;
     --bg: #eef2f7;
     --surface: #ffffff;
     --surface-2: #e3eaf3;
@@ -49,6 +66,7 @@
       --bad-soft: #34191a;
       --tip-bg: #e7edf5;
       --tip-ink: #0c1522;
+      --on-accent: #062521;
     }
   }
   :root[data-theme="dark"] {
@@ -74,6 +92,94 @@
     --bad-soft: #34191a;
     --tip-bg: #e7edf5;
     --tip-ink: #0c1522;
+    --on-accent: #062521;
+  }
+
+  /* --- Benchtop: a rack instrument's own front panel --------------------- */
+  :root[data-ui="benchtop"] {
+    color-scheme: dark;
+    --font-head: "IBM Plex Mono", ui-monospace, monospace;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 14.5px; --radius: 4px; --radius-sm: 3px; --panel-border: 1px;
+    --label-case: uppercase; --label-space: 0.06em; --head-scale: 0.86;
+    --bg: #0a0f0e; --surface: #111917; --surface-2: #18231f;
+    --ink: #dceae4; --ink-2: #a9bdb4; --muted: #7c9187;
+    --line: #26332e; --grid: #1c2823;
+    --accent: #2fbf8f; --accent-ink: #57d6ab; --accent-soft: #0f2a22; --on-accent: #05130f;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #3fbf7f; --bad: #e0654f; --good-soft: #0f2a1e; --bad-soft: #2e1815;
+    --tip-bg: #dceae4; --tip-ink: #0a0f0e;
+  }
+  /* --- Studio: neutral chrome, so every colour on screen is data --------- */
+  :root[data-ui="studio"] {
+    color-scheme: dark;
+    --font-head: Archivo, "Helvetica Neue", Arial, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px; --radius: 13px; --radius-sm: 10px; --panel-border: 1px;
+    --label-case: none; --label-space: 0.04em; --head-scale: 1;
+    --bg: #161519; --surface: #1e1d22; --surface-2: #26252c;
+    --ink: #efebe4; --ink-2: #bab5ae; --muted: #8b8780;
+    --line: #33313a; --grid: #2a2830;
+    --accent: #e3d8c6; --accent-ink: #efe6d7; --accent-soft: #2d2a26; --on-accent: #1b1a1e;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #4cbd76; --bad: #e2705f; --good-soft: #1d2a22; --bad-soft: #2e1e1b;
+    --tip-bg: #efebe4; --tip-ink: #161519;
+  }
+  /* --- Blueprint: a drawing sheet, grid and all ------------------------- */
+  :root[data-ui="blueprint"] {
+    color-scheme: dark;
+    --font-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px; --radius: 3px; --radius-sm: 2px; --panel-border: 1px;
+    --label-case: uppercase; --label-space: 0.07em; --head-scale: 1.02;
+    --bg: #082036; --surface: #0c2b47; --surface-2: #123855;
+    --ink: #dbeaf7; --ink-2: #a7c4dd; --muted: #7ba0c0;
+    --line: #1d4b71; --grid: #123a58;
+    --accent: #4fb0e0; --accent-ink: #86caee; --accent-soft: #0e3a59; --on-accent: #05192b;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #46b862; --bad: #e8695c; --good-soft: #10352a; --bad-soft: #35201d;
+    --tip-bg: #dbeaf7; --tip-ink: #082036;
+  }
+  :root[data-ui="blueprint"] body {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  /* --- Daylight: the friendliest reading of the same content ------------- */
+  :root[data-ui="daylight"] {
+    color-scheme: light;
+    --font-head: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-body: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 16.5px; --radius: 16px; --radius-sm: 12px; --panel-border: 2px;
+    --label-case: none; --label-space: 0.02em; --head-scale: 1.04;
+    --bg: #f1f6f8; --surface: #ffffff; --surface-2: #e6eff3;
+    --ink: #15303d; --ink-2: #3f5c6b; --muted: #6f8f9e;
+    --line: #cbdee6; --grid: #e2edf2;
+    --accent: #0b7285; --accent-ink: #08596a; --accent-soft: #ddf0f4; --on-accent: #ffffff;
+    --s1: #1baf7a; --s2: #eb6834; --s3: #2a78d6; --s4: #eda100;
+    --good: #1a7f37; --bad: #c0392b; --good-soft: #e2f1e6; --bad-soft: #fae7e4;
+    --tip-bg: #15303d; --tip-ink: #ffffff;
+  }
+  /* --- Chalkboard: the lecture-room version ------------------------------ */
+  :root[data-ui="chalkboard"] {
+    color-scheme: dark;
+    --font-head: Caveat, "Bradley Hand", cursive;
+    --font-body: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15.5px; --radius: 8px; --radius-sm: 6px; --panel-border: 1px;
+    --label-case: none; --label-space: 0.03em; --head-scale: 1.5;
+    --bg: #22302a; --surface: #2a3a33; --surface-2: #32443c;
+    --ink: #f4f1e4; --ink-2: #d3dac9; --muted: #9aa895;
+    --line: #3d5148; --grid: #334640;
+    --accent: #f0d264; --accent-ink: #f6e492; --accent-soft: #3b4634; --on-accent: #22302a;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #6cc47f; --bad: #e8806b; --good-soft: #2b3f31; --bad-soft: #402924;
+    --tip-bg: #f4f1e4; --tip-ink: #22302a;
   }
 
   * { box-sizing: border-box; }
@@ -82,13 +188,13 @@
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-    font-size: 15px;
+    font-family: var(--font-body);
+    font-size: var(--fs);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; text-wrap: balance; margin: 0; }
-  .mono, code { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+  .mono, code { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
   a { color: var(--accent-ink); }
   button { font: inherit; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -96,75 +202,75 @@
   .app { display: grid; grid-template-columns: 258px minmax(0, 1fr); min-height: 100vh; }
   .side { border-right: 1px solid var(--line); background: var(--surface); padding: 20px 14px 32px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
   .brand { padding: 0 8px 12px; }
-  .brand h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand h1 { font-size: calc(20px * var(--head-scale)); font-weight: 700; letter-spacing: -0.01em; }
   .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
-  .nav-part { margin: 14px 0 3px; padding: 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .nav-part { margin: 14px 0 3px; padding: 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); }
   .nav a { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font-size: 13.5px; }
   .nav a:hover { background: var(--surface-2); color: var(--ink); }
   .nav a.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
   .nav a .n { width: 21px; height: 21px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10.5px; font-weight: 600; background: var(--surface-2); color: var(--ink-2); flex: none; }
-  .nav a.active .n { background: var(--accent); color: #fff; }
+  .nav a.active .n { background: var(--accent); color: var(--on-accent); }
 
   .main { padding: 28px 34px 60px; max-width: 1200px; }
-  .eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 7px; }
-  .panel h2 { font-size: 29px; font-weight: 700; line-height: 1.16; letter-spacing: -0.01em; margin-bottom: 9px; }
+  .eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--accent-ink); margin-bottom: 7px; }
+  .panel h2 { font-size: calc(29px * var(--head-scale)); font-weight: 700; line-height: 1.16; letter-spacing: -0.01em; margin-bottom: 9px; }
   .idea { font-size: 16px; color: var(--ink-2); max-width: 68ch; margin: 0 0 20px; }
 
   .lab { display: grid; grid-template-columns: 296px minmax(0, 1fr); gap: 20px; align-items: start; }
-  .controls { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 15px 17px; display: grid; gap: 13px; position: sticky; top: 18px; }
-  .controls h3 { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .controls { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 15px 17px; display: grid; gap: 13px; position: sticky; top: 18px; }
+  .controls h3 { font-family: var(--font-body); font-size: 11px; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); font-weight: 600; }
   .ctl > label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); margin-bottom: 3px; }
-  .ctl output { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .ctl output { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; white-space: nowrap; }
   .ctl input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
   .seg { display: flex; flex-wrap: wrap; gap: 5px; }
   .seg button { padding: 4px 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); border-radius: 999px; cursor: pointer; font-size: 12.5px; }
   .seg button:hover { border-color: var(--accent); }
-  .seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn { padding: 7px 13px; border-radius: 7px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; font-weight: 600; font-size: 13px; }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn { padding: 7px 13px; border-radius: var(--radius-sm); border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); cursor: pointer; font-weight: 600; font-size: 13px; }
   .btn.ghost { background: transparent; color: var(--accent-ink); }
   .btn:disabled { opacity: 0.45; cursor: default; }
 
   .charts { display: grid; gap: 12px; min-width: 0; }
-  .chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px 7px; min-width: 0; }
+  .chart { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 11px 12px 7px; min-width: 0; }
   .chart .t { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin: 0 0 3px 3px; }
   .chart canvas { width: 100%; display: block; touch-action: pan-y; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
 
   .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 9px; }
-  .ro { background: var(--surface-2); border-radius: 8px; padding: 9px 11px; }
-  .ro .v { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.25; }
+  .ro { background: var(--surface-2); border-radius: var(--radius-sm); padding: 9px 11px; }
+  .ro .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.25; }
   .ro .l { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
   .ro.good { background: var(--good-soft); } .ro.good .v { color: var(--good); }
   .ro.bad { background: var(--bad-soft); } .ro.bad .v { color: var(--bad); }
   .ro.accent .v { color: var(--accent-ink); }
 
   .below { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
-  .card { border-radius: 10px; padding: 15px 17px; }
-  .card b { display: block; font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 5px; }
+  .card { border-radius: var(--radius); padding: 15px 17px; }
+  .card b { display: block; font-size: 11px; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); margin-bottom: 5px; }
   .analogy { background: var(--accent-soft); }
   .analogy b { color: var(--accent-ink); }
   .eqcard { background: var(--surface); border: 1px solid var(--line); }
   .eqcard b, .trycard b { color: var(--muted); }
-  .eqcard .eq { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13px; line-height: 1.85; overflow-x: auto; }
+  .eqcard .eq { font-family: var(--font-mono); font-size: 13px; line-height: 1.85; overflow-x: auto; }
   .eqcard .eq .live { color: var(--accent-ink); font-weight: 500; }
   .trycard { background: var(--surface); border: 1px dashed var(--line); grid-column: 1 / -1; }
   .trycard ol { margin: 0; padding-left: 19px; color: var(--ink-2); font-size: 14px; }
   .trycard li { margin: 3px 0; }
 
   .chain { display: flex; gap: 5px; align-items: stretch; margin: 4px 0 18px; overflow-x: auto; padding-bottom: 5px; }
-  .chain a { flex: 1 0 116px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; text-decoration: none; color: inherit; }
+  .chain a { flex: 1 0 116px; background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius-sm); padding: 9px 10px; text-decoration: none; color: inherit; }
   .chain a:hover { border-color: var(--accent); }
   .chain .k { font-weight: 600; font-size: 13.5px; }
   .chain .d { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
   .chain .arrow { align-self: center; color: var(--muted); flex: none; }
 
   .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 11px; margin-top: 8px; }
-  .home-grid a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px; text-decoration: none; color: inherit; }
+  .home-grid a { display: block; background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 13px 15px; text-decoration: none; color: inherit; }
   .home-grid a:hover { border-color: var(--accent); }
   .home-grid .p { font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
-  .home-grid .h { font-family: "Source Serif 4", Georgia, serif; font-size: 16.5px; font-weight: 600; margin: 3px 0 3px; }
+  .home-grid .h { font-family: var(--font-head); font-size: calc(16.5px * var(--head-scale)); font-weight: 600; margin: 3px 0 3px; }
   .home-grid .s { font-size: 12.5px; color: var(--ink-2); }
-  .section-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+  .section-label { font-size: 11.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); margin: 22px 0 8px; }
 
   .pill { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
   .pill.good { background: var(--good-soft); color: var(--good); }
@@ -173,7 +279,7 @@
   table.steps { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.steps th, table.steps td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); }
   table.steps th { color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
-  table.steps td.m { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  table.steps td.m { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
   table.steps tr.now td { background: var(--accent-soft); }
   .tablewrap { overflow-x: auto; }
 
@@ -183,15 +289,40 @@
   .bins button.hum { background: var(--s2); border-color: var(--s2); }
   .bins button.off { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 3px, var(--line) 3px, var(--line) 5px); }
 
-  .q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+  .q { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
   .q p { margin: 0 0 9px; font-weight: 600; }
   .opts { display: grid; gap: 5px; }
-  .opts button { text-align: left; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .opts button { text-align: left; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
   .opts button:hover:not(:disabled) { border-color: var(--accent); }
   .opts button.right { background: var(--good-soft); border-color: var(--good); }
   .opts button.wrong { background: var(--bad-soft); border-color: var(--bad); }
   .why { font-size: 13px; color: var(--ink-2); margin-top: 7px; }
   .foot { margin-top: 34px; color: var(--muted); font-size: 12.5px; max-width: 68ch; }
+
+  .themes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; padding: 2px 8px 0; }
+  .themes button { height: 24px; border-radius: var(--radius-sm); border: 2px solid var(--line); cursor: pointer; padding: 0; position: relative; overflow: hidden; }
+  .themes button.on { border-color: var(--accent); }
+  .themes button i { position: absolute; right: 3px; bottom: 3px; width: 7px; height: 7px; border-radius: 50%; }
+  .theme-note { padding: 5px 8px 2px; font-size: 11.5px; color: var(--muted); line-height: 1.45; min-height: 3.1em; }
+  .hint { padding: 8px 8px 0; margin-top: 6px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); line-height: 2; }
+  .kbd { font-family: var(--font-mono); font-size: 10.5px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; color: var(--ink-2); }
+  .labnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 24px; }
+  .labnav a { text-decoration: none; padding: 9px 14px; border-radius: var(--radius-sm); border: var(--panel-border) solid var(--line); background: var(--surface); color: var(--ink-2); font-size: 13.5px; }
+  .labnav a:hover { border-color: var(--accent); color: var(--ink); }
+  .labnav a.spacer { visibility: hidden; }
+  .lw { display: flex; align-items: center; gap: 7px; }
+  .sweep { border: 1px solid var(--line); background: var(--surface); color: var(--accent-ink); border-radius: 999px; width: 21px; height: 21px; line-height: 1; cursor: pointer; padding: 0; font-size: 9px; flex: none; }
+  .sweep:hover { border-color: var(--accent); }
+  .sweep.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .exitp { position: fixed; top: 10px; right: 14px; z-index: 30; display: none; }
+  :root[data-present] .exitp { display: block; }
+  :root[data-present] { --fs: 17.5px; }
+  :root[data-present] .side { display: none; }
+  :root[data-present] .app { grid-template-columns: minmax(0, 1fr); }
+  :root[data-present] .main { padding: 24px 34px 40px; max-width: none; }
+  :root[data-present] .panel h2 { font-size: calc(34px * var(--head-scale)); }
+  :root[data-present] .idea { font-size: 18px; max-width: 82ch; }
+  :root[data-present] .ro .v { font-size: 23px; }
 
   @media (max-width: 940px) {
     .app { grid-template-columns: 1fr; }
@@ -210,10 +341,15 @@
 <div class="app">
   <aside class="side">
     <div class="brand"><h1>RF Signal Lab</h1><p>Move a slider, watch the maths</p></div>
+    <div class="nav-part">Look</div>
+    <div class="themes" id="themes" role="group" aria-label="Interface theme"></div>
+    <div class="theme-note" id="themeNote"></div>
     <nav class="nav" id="nav" aria-label="Labs"></nav>
+    <div class="hint" id="hints"></div>
   </aside>
   <main class="main" id="main"></main>
 </div>
+<button class="btn exitp" id="exitp" type="button">Leave presentation mode</button>
 
 <script>
 (() => {
@@ -281,6 +417,7 @@ function niceTicks(min, max, count) {
   return out;
 }
 let charts = [];
+let sweepTimers = [];
 function makeChart(host, title, height) {
   height = height || 220;
   const wrap = document.createElement('div'); wrap.className = 'chart';
@@ -304,6 +441,7 @@ function paint(ch) {
   const dpr = window.devicePixelRatio || 1;
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
   const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const FM = css('--font-mono') || 'monospace', FB = css('--font-body') || 'sans-serif';
   const C = { ink: css('--ink'), ink2: css('--ink-2'), muted: css('--muted'), grid: css('--grid'), line: css('--line'), surface: css('--surface'), tipBg: css('--tip-bg'), tipInk: css('--tip-ink'), s: [css('--s1'), css('--s2'), css('--s3'), css('--s4')] };
   const legend = spec.series.filter(s => s.label).length >= 2 ? 18 : 0;
   const pad = { l: spec.ylabel ? 54 : 42, r: 12, t: 8 + legend, b: spec.xlabel ? 36 : 22 };
@@ -321,7 +459,7 @@ function paint(ch) {
   const Y = v => pad.t + (ymax - v) / (ymax - ymin) * ph;
   const clampY = v => Math.max(ymin - (ymax - ymin), Math.min(ymax + (ymax - ymin), v));
 
-  g.font = '11px "IBM Plex Mono", ui-monospace, monospace';
+  g.font = '11px ' + FM;
   g.strokeStyle = C.grid; g.lineWidth = 1; g.fillStyle = C.muted; g.textAlign = 'right'; g.textBaseline = 'middle';
   for (const t of niceTicks(ymin, ymax, 4)) {
     const y = Y(t); if (y < pad.t - 1 || y > pad.t + ph + 1) continue;
@@ -337,7 +475,7 @@ function paint(ch) {
   g.strokeStyle = C.line; g.beginPath(); g.moveTo(pad.l, pad.t + ph); g.lineTo(W - pad.r, pad.t + ph); g.stroke();
   if (ymin < 0 && ymax > 0) { g.beginPath(); g.moveTo(pad.l, Y(0)); g.lineTo(W - pad.r, Y(0)); g.stroke(); }
 
-  g.fillStyle = C.ink2; g.font = '11.5px "IBM Plex Sans", system-ui, sans-serif';
+  g.fillStyle = C.ink2; g.font = '11.5px ' + FB;
   if (spec.xlabel) { g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillText(spec.xlabel, pad.l + pw / 2, H - 3); }
   if (spec.ylabel) { g.save(); g.translate(11, pad.t + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(spec.ylabel, 0, 0); g.restore(); }
 
@@ -355,11 +493,13 @@ function paint(ch) {
       }
     } else if (kind === 'stem') {
       const y0 = Y(Math.max(ymin, Math.min(ymax, 0)));
-      g.lineWidth = 1.5;
+      // Sample markers carry the lesson in several labs, so keep them solid
+      // enough to read on the dark themes as well as the light ones.
+      g.lineWidth = 2;
       for (let i = 0; i < s.xs.length; i++) {
         const x = X(s.xs[i]), y = Y(clampY(s.ys[i]));
         g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y); g.stroke();
-        g.beginPath(); g.arc(x, y, 3, 0, TWO_PI); g.fill();
+        g.beginPath(); g.arc(x, y, 3.5, 0, TWO_PI); g.fill();
       }
     } else {
       if (kind !== 'dots') {
@@ -385,7 +525,7 @@ function paint(ch) {
 
   const labelled = spec.series.filter(s => s.label);
   if (legend) {
-    g.font = '11.5px "IBM Plex Sans", system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left';
+    g.font = '11.5px ' + FB; g.textBaseline = 'middle'; g.textAlign = 'left';
     let x = pad.l, y = 9;
     labelled.forEach(s => {
       const col = s.color || C.s[spec.series.indexOf(s) % 4], w = g.measureText(s.label).width;
@@ -408,7 +548,7 @@ function paint(ch) {
       g.strokeStyle = C.surface; g.lineWidth = 2; g.stroke();
       const lines = spec.tip(bi, hs).filter(Boolean);
       if (lines.length) {
-        g.font = '12px "IBM Plex Mono", ui-monospace, monospace';
+        g.font = '12px ' + FM;
         const w = Math.max(...lines.map(l => g.measureText(l).width)) + 16, h = lines.length * 16 + 10;
         let tx = x + 12, ty = pad.t + 4;
         if (tx + w > W - pad.r) tx = Math.max(pad.l, x - 12 - w);
@@ -422,20 +562,43 @@ function paint(ch) {
 const repaintAll = () => charts.forEach(paint);
 const mq = window.matchMedia('(prefers-color-scheme: dark)');
 if (mq.addEventListener) mq.addEventListener('change', repaintAll);
-new MutationObserver(repaintAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+new MutationObserver(repaintAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-ui', 'data-present'] });
 
 /* ===================== small UI builders ===================== */
 function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
 function slider(host, label, opts) {
-  const wrap = el('div', 'ctl'), lab = el('label'), out = el('output');
-  lab.append(el('span', null, label), out);
+  const wrap = el('div', 'ctl'), lab = el('label'), out = el('output'), right = el('span', 'lw');
   const inp = document.createElement('input');
   inp.type = 'range'; inp.min = opts.min; inp.max = opts.max; inp.step = opts.step; inp.value = opts.log ? Math.log10(opts.value) : opts.value;
   inp.setAttribute('aria-label', label);
-  wrap.append(lab, inp); host.appendChild(wrap);
   const get = () => opts.log ? 10 ** Number(inp.value) : Number(inp.value);
   const show = () => { out.textContent = opts.fmt(get()); };
-  inp.addEventListener('input', () => { show(); opts.on(get()); });
+  right.appendChild(out);
+  if (opts.sweep) {
+    // Runs the slider end to end on its own, so the room can watch the effect
+    // instead of watching someone drag.
+    const play = el('button', 'sweep', '▶');
+    play.type = 'button';
+    play.title = 'Sweep this control automatically';
+    play.setAttribute('aria-label', 'Sweep ' + label + ' automatically');
+    let timer = null, dir = 1;
+    const stop = () => { clearInterval(timer); timer = null; play.classList.remove('on'); play.textContent = '▶'; play.title = 'Sweep this control automatically'; };
+    const tick = () => {
+      const lo = Number(inp.min), hi = Number(inp.max), st = Number(inp.step) || 1;
+      let v = Number(inp.value) + dir * st;
+      if (v >= hi) { v = hi; dir = -1; } else if (v <= lo) { v = lo; dir = 1; }
+      inp.value = v; show(); opts.on(get());
+    };
+    play.addEventListener('click', () => {
+      if (timer) { stop(); return; }
+      timer = setInterval(tick, 45); sweepTimers.push(timer);
+      play.classList.add('on'); play.textContent = '❚❚'; play.title = 'Stop the sweep';
+    });
+    inp.addEventListener('pointerdown', stop);
+    right.appendChild(play);
+  }
+  lab.append(el('span', null, label), right);
+  wrap.append(lab, inp); host.appendChild(wrap);
   show();
   return { get, set(v) { inp.value = opts.log ? Math.log10(v) : v; show(); } };
 }
@@ -557,7 +720,7 @@ lab({ id: 'wave', part: 'Part 1', nav: 'The wave', blurb: 'Three knobs: height, 
       + 'one repeat: T = 1 / ' + st.f.toFixed(1) + ' = ' + hi(fmt.si(1 / st.f, 's')));
   }
   slider(controls, 'Height A', { min: 0, max: 1, step: 0.05, value: 1, fmt: v => v.toFixed(2), on: v => { st.A = v; draw(); } });
-  slider(controls, 'Frequency f', { min: 0.5, max: 6, step: 0.1, value: 2, fmt: v => v.toFixed(1) + ' Hz', on: v => { st.f = v; draw(); } });
+  slider(controls, 'Frequency f', { min: 0.5, max: 6, step: 0.1, value: 2, sweep: true, fmt: v => v.toFixed(1) + ' Hz', on: v => { st.f = v; draw(); } });
   slider(controls, 'Starting point φ', { min: 0, max: 360, step: 5, value: 0, fmt: v => v + '°', on: v => { st.phi = v; draw(); } });
   draw();
 }});
@@ -729,7 +892,7 @@ lab({ id: 'sampling', part: 'Part 2', nav: 'Sampling & aliasing', blurb: 'How of
             : 'disguise: |f − k·f_s| = |' + st.f.toFixed(1) + ' − ' + Math.round(st.f / st.fs) + '·' + st.fs.toFixed(1) + '| = ' + hi(falias.toFixed(2) + ' kHz')));
   }
   sF = slider(controls, 'Wave frequency', { min: 0.2, max: 10, step: 0.1, value: 1, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f = v; draw(); } });
-  sFs = slider(controls, 'Sample rate', { min: 1, max: 24, step: 0.5, value: 12, fmt: v => v.toFixed(1) + ' kSPS', on: v => { st.fs = v; draw(); } });
+  sFs = slider(controls, 'Sample rate', { min: 1, max: 24, step: 0.5, value: 12, sweep: true, fmt: v => v.toFixed(1) + ' kSPS', on: v => { st.fs = v; draw(); } });
   segmented(controls, 'Presets', [
     { label: 'Comfortable', value: [1, 12] }, { label: 'Just enough', value: [1, 2.5] }, { label: '9 kHz at 8 kSPS', value: [9, 8] }],
     [1, 12], v => { st.f = v[0]; st.fs = v[1]; sF.set(v[0]); sFs.set(v[1]); draw(); });
@@ -769,7 +932,7 @@ lab({ id: 'quant', part: 'Part 3', nav: 'Quantisation & bits', blurb: 'A ruler w
       + 'error power = step² / 12, so the error is never more than half a step<br>'
       + 'SNR = 6.02 · ' + st.bits + ' + 1.76 = ' + hi(fmt.n(snrBits(st.bits)) + ' dB') + ' for a full-size wave');
   }
-  slider(controls, 'Bits N', { min: 1, max: 12, step: 1, value: 3, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Bits N', { min: 1, max: 12, step: 1, value: 3, sweep: true, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
   slider(controls, 'Wave height, of full scale', { min: 0.05, max: 1, step: 0.05, value: 0.9, fmt: v => v.toFixed(2), on: v => { st.amp = v; draw(); } });
   draw();
 }});
@@ -856,7 +1019,7 @@ lab({ id: 'jitter', part: 'Part 3', nav: 'Timing wobble', blurb: 'Why fast signa
       + 'your bits give 6.02 · ' + st.bits + ' + 1.76 = ' + fmt.n(ql) + ' dB; the worse of the two wins<br>'
       + 'together: ' + fmt.n(tot) + ' dB, which is ' + hi(fmt.n(enob) + ' real bits'));
   }
-  slider(controls, 'Input frequency', { min: 6, max: 9.3, step: 0.05, value: 1e7, log: true, fmt: v => fmt.si(v, 'Hz', 3), on: v => { st.f = v; draw(); } });
+  slider(controls, 'Input frequency', { min: 6, max: 9.3, step: 0.05, value: 1e7, log: true, sweep: true, fmt: v => fmt.si(v, 'Hz', 3), on: v => { st.f = v; draw(); } });
   slider(controls, 'Clock wobble', { min: -14, max: -10.5, step: 0.1, value: 1e-12, log: true, fmt: v => fmt.si(v, 's', 2), on: v => { st.tj = v; draw(); } });
   segmented(controls, 'ADC bits', [{ label: '8', value: 8 }, { label: '12', value: 12 }, { label: '14', value: 14 }, { label: '16', value: 16 }], 12, v => { st.bits = v; draw(); });
   draw();
@@ -898,7 +1061,7 @@ lab({ id: 'fft', part: 'Part 4', nav: 'FFT explorer', blurb: 'Build a signal, wa
       + (whole ? ' — a whole number, so no smearing' : ' — not a whole number, so it smears unless you use a window') + '<br>'
       + 'X[k] = Σ x[n] · e^(−j2πkn/N),  k = 0 … ' + (N - 1));
   }
-  slider(controls, 'Tone 1 frequency', { min: 1, max: 120, step: 0.5, value: 30, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f1 = v; draw(); } });
+  slider(controls, 'Tone 1 frequency', { min: 1, max: 120, step: 0.5, value: 30, sweep: true, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f1 = v; draw(); } });
   slider(controls, 'Tone 1 height', { min: 0, max: 1, step: 0.02, value: 1, fmt: v => v.toFixed(2), on: v => { st.a1 = v; draw(); } });
   slider(controls, 'Tone 2 frequency', { min: 1, max: 120, step: 0.5, value: 75, fmt: v => v.toFixed(1) + ' kHz', on: v => { st.f2 = v; draw(); } });
   slider(controls, 'Tone 2 height', { min: 0, max: 1, step: 0.02, value: 0.3, fmt: v => v.toFixed(2), on: v => { st.a2 = v; draw(); } });
@@ -939,7 +1102,7 @@ lab({ id: 'butterfly', part: 'Part 4', nav: 'Why the FFT is fast', blurb: 'Split
       + 'plain: N² = ' + hi(fmt.int(dft)) + '  ·  FFT: (N/2) · log₂N = ' + fmt.int(N / 2) + ' · ' + st.logN + ' = ' + hi(fmt.int(f)) + '<br>'
       + 'each step: top = a + W·b, bottom = a − W·b — one multiply, two adds');
   }
-  slider(controls, 'Readings N', { min: 3, max: 16, step: 1, value: 10, fmt: v => 'N = ' + fmt.int(2 ** v), on: v => { st.logN = v; draw(); } });
+  slider(controls, 'Readings N', { min: 3, max: 16, step: 1, value: 10, sweep: true, fmt: v => 'N = ' + fmt.int(2 ** v), on: v => { st.logN = v; draw(); } });
   draw();
 }});
 
@@ -1051,7 +1214,7 @@ lab({ id: 'ofdm', part: 'Part 5', nav: 'OFDM in Wi-Fi', blurb: 'Many slow lanes 
       + 'receiver: FFT(waveform) = exactly those symbols again<br>'
       + 'spacing = 20 MHz / 64 = ' + hi('312.5 kHz') + ', one symbol every 4 µs → ' + hi(fmt.si(bits * 250000, 'bit/s', 3)));
   }
-  slider(controls, 'Subcarriers used', { min: 2, max: 62, step: 2, value: 52, fmt: v => v + ' of 64', on: v => { st.used = v; draw(); } });
+  slider(controls, 'Subcarriers used', { min: 2, max: 62, step: 2, value: 52, sweep: true, fmt: v => v + ' of 64', on: v => { st.used = v; draw(); } });
   buttons(controls, [{ label: 'New data', on: () => { st.seed++; draw(); } }]);
   draw();
 }});
@@ -1101,7 +1264,7 @@ lab({ id: 'calc', part: 'Part 5', nav: 'Design calculator', blurb: 'A radio tone
       + 'accuracy = 6.02 · ' + st.bits + ' + 1.76 = ' + fmt.n(snr) + ' dB  ·  floor = −' + fmt.n(snr) + ' − 10 log₁₀(' + st.N / 2 + ') = ' + hi(fmt.n(floor) + ' dB'));
   }
   slider(controls, 'Radio frequency', { min: 2400, max: 2500, step: 1, value: 2400, fmt: v => v + ' MHz', on: v => { st.frf = v; draw(); } });
-  slider(controls, 'Local oscillator', { min: 2370, max: 2500, step: 1, value: 2390, fmt: v => v + ' MHz', on: v => { st.flo = v; draw(); } });
+  slider(controls, 'Local oscillator', { min: 2370, max: 2500, step: 1, value: 2390, sweep: true, fmt: v => v + ' MHz', on: v => { st.flo = v; draw(); } });
   segmented(controls, 'Sample rate', [{ label: '20', value: 20 }, { label: '40', value: 40 }, { label: '80', value: 80 }, { label: '160 MSPS', value: 160 }], 40, v => { st.fs = v; draw(); });
   segmented(controls, 'ADC bits', [{ label: '8', value: 8 }, { label: '12', value: 12 }, { label: '14', value: 14 }, { label: '16', value: 16 }], 12, v => { st.bits = v; draw(); });
   segmented(controls, 'FFT size', [{ label: '256', value: 256 }, { label: '1024', value: 1024 }, { label: '4096', value: 4096 }], 1024, v => { st.N = v; draw(); });
@@ -1149,6 +1312,56 @@ lab({ id: 'quiz', part: 'Check yourself', nav: 'Quiz', blurb: 'Eight questions, 
   });
 }});
 
+/* ===================== interface themes ===================== */
+const THEMES = [
+  { id: 'lab', name: 'Instrument lab', bg: '#eef2f7', ac: '#0e7c76',
+    note: 'Calibration blue on paper. The only theme that follows your device\u2019s light or dark setting.' },
+  { id: 'benchtop', name: 'Benchtop', bg: '#0a0f0e', ac: '#2fbf8f',
+    note: 'The front panel of a rack instrument: square corners, dense rows, phosphor green.' },
+  { id: 'studio', name: 'Studio', bg: '#161519', ac: '#e3d8c6',
+    note: 'Bone and charcoal chrome with generous spacing, so the only colour on screen is your data.' },
+  { id: 'blueprint', name: 'Blueprint', bg: '#082036', ac: '#4fb0e0',
+    note: 'A drawing sheet: navy ground, a real grid behind the page, condensed drafting labels.' },
+  { id: 'daylight', name: 'Daylight', bg: '#f1f6f8', ac: '#0b7285',
+    note: 'Biggest type, roundest corners, most air. The easiest one to read from the back of a room.' },
+  { id: 'chalkboard', name: 'Chalkboard', bg: '#22302a', ac: '#f0d264',
+    note: 'The lecture-room look: green board, chalk yellow, handwritten headings.' },
+];
+const root = document.documentElement;
+const themesEl = document.getElementById('themes'), noteEl = document.getElementById('themeNote');
+let themeId = 'lab';
+try { const saved = localStorage.getItem('rfLabTheme'); if (saved && THEMES.some(t => t.id === saved)) themeId = saved; } catch (e) { /* private mode */ }
+
+function applyTheme(id) {
+  themeId = id;
+  if (id === 'lab') root.removeAttribute('data-ui'); else root.setAttribute('data-ui', id);
+  try { localStorage.setItem('rfLabTheme', id); } catch (e) { /* private mode */ }
+  const t = THEMES.find(x => x.id === id);
+  noteEl.textContent = t.name + '. ' + t.note;
+  themesEl.querySelectorAll('button').forEach(b => {
+    const on = b.dataset.id === id;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+THEMES.forEach(t => {
+  const b = el('button', '', '<i style="background:' + t.ac + '"></i>');
+  b.type = 'button'; b.dataset.id = t.id; b.title = t.name;
+  b.setAttribute('aria-label', 'Theme: ' + t.name);
+  b.style.background = t.bg;
+  b.addEventListener('click', () => applyTheme(t.id));
+  themesEl.appendChild(b);
+});
+applyTheme(themeId);
+
+/* ===================== presentation mode ===================== */
+const exitBtn = document.getElementById('exitp');
+function setPresent(on) {
+  if (on) root.setAttribute('data-present', ''); else root.removeAttribute('data-present');
+  repaintAll();
+}
+exitBtn.addEventListener('click', () => setPresent(false));
+
 /* ===================== navigation ===================== */
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 let part = null, idx = 0;
@@ -1157,15 +1370,48 @@ LABS.forEach(l => {
   const a = el('a', null, '<span class="n">' + (l.id === 'home' ? '⌂' : ++idx) + '</span><span>' + l.nav + '</span>');
   a.href = '#' + l.id; a.dataset.id = l.id; nav.appendChild(a);
 });
+document.getElementById('hints').innerHTML =
+  '<span class="kbd">\u2190</span> <span class="kbd">\u2192</span> move between labs<br>'
+  + '<span class="kbd">T</span> next theme &nbsp; <span class="kbd">P</span> presentation mode';
+
 function show() {
   const id = (location.hash || '#home').slice(1);
-  const l = LABS.find(x => x.id === id) || LABS[0];
+  const i = Math.max(0, LABS.findIndex(x => x.id === id));
+  const l = LABS[i];
+  sweepTimers.forEach(clearInterval); sweepTimers = [];
   charts = [];
   main.innerHTML = '';
   l.build(main);
+  const bar = el('div', 'labnav');
+  const prev = LABS[i - 1], next = LABS[i + 1];
+  bar.appendChild(prev ? Object.assign(el('a', null, '\u2190 ' + prev.nav), { href: '#' + prev.id })
+                       : el('a', 'spacer', '\u2190'));
+  bar.appendChild(next ? Object.assign(el('a', null, next.nav + ' \u2192'), { href: '#' + next.id })
+                       : el('a', 'spacer', '\u2192'));
+  main.appendChild(bar);
   nav.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === l.id));
   window.scrollTo(0, 0);
 }
+function step(d) {
+  const id = (location.hash || '#home').slice(1);
+  const i = Math.max(0, LABS.findIndex(x => x.id === id));
+  const t = LABS[i + d];
+  if (t) location.hash = '#' + t.id;
+}
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (e.key === 'ArrowRight') { step(1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { step(-1); e.preventDefault(); }
+  else if (e.key === 't' || e.key === 'T') {
+    applyTheme(THEMES[(THEMES.findIndex(x => x.id === themeId) + 1) % THEMES.length].id);
+  } else if (e.key === 'p' || e.key === 'P') {
+    setPresent(!root.hasAttribute('data-present'));
+  } else if (e.key === 'Escape') {
+    setPresent(false);
+  }
+});
 window.addEventListener('hashchange', show);
 show();
 })();
