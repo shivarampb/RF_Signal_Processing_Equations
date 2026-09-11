@@ -124,12 +124,13 @@ function contentSlide(pres, title, meta) {
   const s = pres.addSlide();
   s.background = { color: C.white };
   // Cambria bold at 28pt holds about 33 characters across 9"; step down for longer titles.
-  const len = title.length;
+  const avail = (meta && meta.titleW) || W - 2 * M;
+  const len = title.length * (9 / avail);
   const titleSize = len <= 33 ? 28 : len <= 39 ? 24 : len <= 46 ? 20 : 18;
   s.addText(title, {
     x: M,
     y: 0.32,
-    w: W - 2 * M,
+    w: (meta && meta.titleW) || W - 2 * M,
     h: 0.7,
     fontFace: F.head,
     fontSize: titleSize,

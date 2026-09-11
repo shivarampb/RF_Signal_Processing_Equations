@@ -1,3 +1,14 @@
+# RF Signal Processing, and Inside the ADC
+
+Two self-contained presentations, each with a PowerPoint deck and a matching interactive web app:
+
+| Talk | Deck | App | Covers |
+|---|---|---|---|
+| **RF Signal Processing** | `presentation/RF_Signal_Processing.pptx` (51 slides) | `app/index.html` | Antenna to bits: waves, dB, I/Q, sampling, the ADC, the FFT and IFFT |
+| **Inside the ADC** | `presentation/ADC_Parameters.pptx` (58 slides) | `app/adc.html` | Every parameter a datasheet quotes, one slide and one lab each |
+
+---
+
 # RF Signal Processing: how a radio wave becomes numbers
 
 A 90-minute presentation for a mixed audience of RF engineers and complete newcomers.
@@ -54,9 +65,11 @@ JavaScript at build time, so they can be restyled or inspected inside PowerPoint
 ```bash
 npm install            # installs pptxgenjs only
 npm run check          # DSP self-checks: FFT = DFT, IFFT round trip, SNR(12 bit) = 74 dB, bucket arithmetic
+npm run check-adc      # ADC self-checks: DNL/INL, SNR, ENOB, harmonics, jitter, settling, figures of merit
 npm run outline        # writes presentation/outline.md
 npm run build          # writes presentation/RF_Signal_Processing.pptx
-npm run app            # writes app/index.html from app/rf-signal-lab.html
+npm run build-adc      # writes presentation/ADC_Parameters.pptx
+npm run app            # writes both app/index.html and app/adc.html
 ```
 
 The app needs nothing installed: it is one self-contained HTML file. `npm install` is only for
@@ -94,6 +107,51 @@ slide deck, so the app and the slides can never disagree.
 | 4 · FFT and IFFT | 25 | Why frequencies, one idea three versions, what k, n and N mean, comparing with test waves, the butterfly, an 8-point FFT, windowing, IFFT |
 | 5 · Putting it together | 12 | One complete example (2.4 GHz tone to FFT bucket 256), Wi-Fi and 5G, five classic mistakes, the equation sheet |
 | Appendix | 0 | Expert notes collected by topic; not presented |
+
+---
+
+# Inside the ADC: every parameter on the datasheet
+
+A 90-minute companion talk that takes the one component the first talk treats as a black box and
+opens it up. Each parameter gets the same treatment: what it means in plain words, the equation, a
+chart, a real number, and what goes wrong when you ignore it.
+
+**Deck:** `presentation/ADC_Parameters.pptx` — 58 slides, speaker notes on every slide, 35 native
+editable charts, 7 tables and shape-drawn diagrams.
+**App:** `app/adc.html` — 12 labs plus a searchable reference to all 49 parameters.
+
+| Part | Minutes | Parameters covered |
+|---|---:|---|
+| Opening | 4 | What an ADC does; the parameter map: five families |
+| 1 · Resolution and the transfer function | 12 | Resolution, full-scale range, LSB, quantisation error, output coding, reference and its drift |
+| 2 · Static accuracy (DC) | 16 | Offset, gain, DNL, missing codes, monotonicity, INL, TUE, temperature drift, PSRR, CMRR |
+| 3 · Dynamic performance (AC) | 20 | SNR, input-referred noise, noise-free bits, THD, HD2/HD3, SINAD, ENOB, SFDR, IMD, FFT noise floor, dynamic range |
+| 4 · Speed and timing | 14 | Sample rate, conversion time, latency, aperture delay, aperture jitter, acquisition, settling, slew rate, overvoltage recovery |
+| 5 · Bandwidth and sampling | 10 | Analog bandwidth, full-power and full-linear bandwidth, undersampling, Nyquist zones, oversampling ratio, decimation |
+| 6 · Power, interface and figures of merit | 8 | Power dissipation, Walden FoM, Schreier FoM, crosstalk, digital interface |
+| 7 · Architectures and the datasheet | 12 | Flash, SAR, pipeline, delta-sigma, dual-slope; how to read a datasheet in the right order; a worked choice |
+
+## The ADC labs
+
+| # | Lab | What you can play with |
+|---:|---|---|
+| 1 | Transfer function | Bend one staircase with offset, gain, DNL and INL; missing codes, monotonicity and TUE decide themselves |
+| 2 | Quantisation & SNR | Bits and amplitude against the measured SNR, and where 6.02N + 1.76 comes from |
+| 3 | Noise & real bits | Input-referred noise, noise-free bits, effective resolution |
+| 4 | Spectrum | One capture; SNR, THD, SINAD, ENOB and SFDR all measured live as you add distortion, noise and jitter |
+| 5 | Aperture jitter | Input frequency against clock jitter, and the bits that survive |
+| 6 | Acquisition & settling | The bandwidth your driving amplifier must actually have |
+| 7 | Bandwidth & Nyquist zones | Where a tone lands when you undersample, and whether the front end can reach it |
+| 8 | Oversampling | OSR and noise shaping against dynamic range |
+| 9 | Power & figures of merit | Walden and Schreier, on your own numbers, against four reference parts |
+| 10 | Which architecture? | Enter speed, resolution and latency; see which of the five survive |
+| 11 | Every parameter | All 49, searchable, with symbol, unit, meaning and why it matters |
+| 12 | Quiz | Eight questions with the reasoning and a link to the lab |
+
+`src/adc.js` holds the maths for both — transfer functions with real static errors, DNL and INL,
+coherent-sampling FFT metrics, jitter, settling and both figures of merit — with 14 self-checks
+(`npm run check-adc`) that pin it to known values: 12-bit SNR of 74.0 dB, an injected −60 dBc
+harmonic measured back at −60 dBc, and a −1 LSB DNL step reported as a missing code.
 
 ## Presenting tips
 

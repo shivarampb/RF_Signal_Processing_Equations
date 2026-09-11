@@ -1,12 +1,14 @@
 {
   "name": "rf-signal-processing-equations",
   "version": "1.0.0",
-  "description": "RF signal processing presentation: equations, ADC internals, FFT/IFFT. Deck generated with pptxgenjs.",
+  "description": "Two presentations with interactive companions: RF signal processing, and every ADC datasheet parameter.",
   "scripts": {
     "build": "node src/build_deck.js",
+    "build-adc": "node src/build_adc_deck.js",
     "outline": "node src/build_outline.js",
     "app": "node app/build_standalone.js",
-    "check": "node src/dsp.js"
+    "check": "node src/dsp.js",
+    "check-adc": "node src/adc.js"
   },
   "repository": {
     "type": "git",

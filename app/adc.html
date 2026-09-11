@@ -1,0 +1,1434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive companion to the Inside the ADC talk: resolution, LSB, offset, gain, DNL, INL, SNR, THD, SINAD, ENOB, SFDR, jitter, settling, bandwidth and the figures of merit, all computed live.">
+<style>
+  /* The artifact host supplies these defaults; reproduce them for the standalone file. */
+  :root { color-scheme: light dark; }
+  body { margin: 0; font: 14px system-ui, sans-serif; background: #f6f6f4; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>ADC Parameter Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Archivo:wght@500;600;700&family=Nunito:wght@400;600;700&family=Caveat:wght@600;700&display=swap">
+<style>
+  /* ---------------------------------------------------------------------------
+     Six interface themes. The bare :root block is "Instrument lab" in its light
+     form; it is the only theme that follows the reader's light/dark setting.
+     Each named theme below re-declares the whole token set, so it is complete on
+     its own, and sits after the default blocks so an explicit choice always wins.
+     --------------------------------------------------------------------------- */
+  :root {
+    color-scheme: light;
+    --font-head: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px;
+    --radius: 10px;
+    --radius-sm: 8px;
+    --panel-border: 1px;
+    --label-case: uppercase;
+    --label-space: 0em;
+    --head-scale: 1;
+    --on-accent: #ffffff;
+    --bg: #eef2f7;
+    --surface: #ffffff;
+    --surface-2: #e3eaf3;
+    --ink: #0f2440;
+    --ink-2: #445570;
+    --muted: #77869c;
+    --line: #d2dbe7;
+    --grid: #e6ecf3;
+    --accent: #0e7c76;
+    --accent-ink: #0b5d58;
+    --accent-soft: #dcefed;
+    --s1: #1baf7a;
+    --s2: #eb6834;
+    --s3: #2a78d6;
+    --s4: #eda100;
+    --good: #1a7f37;
+    --bad: #c0392b;
+    --good-soft: #e2f1e6;
+    --bad-soft: #fae7e4;
+    --tip-bg: #0f2440;
+    --tip-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0c1522;
+      --surface: #131f30;
+      --surface-2: #1a273a;
+      --ink: #e7edf5;
+      --ink-2: #b3c1d3;
+      --muted: #8194ab;
+      --line: #29384e;
+      --grid: #223146;
+      --accent: #3fb5ab;
+      --accent-ink: #62ccc2;
+      --accent-soft: #103430;
+      --s1: #199e70;
+      --s2: #d95926;
+      --s3: #3987e5;
+      --s4: #c98500;
+      --good: #46b862;
+      --bad: #e8695c;
+      --good-soft: #14301f;
+      --bad-soft: #34191a;
+      --tip-bg: #e7edf5;
+      --tip-ink: #0c1522;
+      --on-accent: #062521;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0c1522;
+    --surface: #131f30;
+    --surface-2: #1a273a;
+    --ink: #e7edf5;
+    --ink-2: #b3c1d3;
+    --muted: #8194ab;
+    --line: #29384e;
+    --grid: #223146;
+    --accent: #3fb5ab;
+    --accent-ink: #62ccc2;
+    --accent-soft: #103430;
+    --s1: #199e70;
+    --s2: #d95926;
+    --s3: #3987e5;
+    --s4: #c98500;
+    --good: #46b862;
+    --bad: #e8695c;
+    --good-soft: #14301f;
+    --bad-soft: #34191a;
+    --tip-bg: #e7edf5;
+    --tip-ink: #0c1522;
+    --on-accent: #062521;
+  }
+
+  /* --- Benchtop: a rack instrument's own front panel --------------------- */
+  :root[data-ui="benchtop"] {
+    color-scheme: dark;
+    --font-head: "IBM Plex Mono", ui-monospace, monospace;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 14.5px; --radius: 4px; --radius-sm: 3px; --panel-border: 1px;
+    --label-case: uppercase; --label-space: 0.06em; --head-scale: 0.86;
+    --bg: #0a0f0e; --surface: #111917; --surface-2: #18231f;
+    --ink: #dceae4; --ink-2: #a9bdb4; --muted: #7c9187;
+    --line: #26332e; --grid: #1c2823;
+    --accent: #2fbf8f; --accent-ink: #57d6ab; --accent-soft: #0f2a22; --on-accent: #05130f;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #3fbf7f; --bad: #e0654f; --good-soft: #0f2a1e; --bad-soft: #2e1815;
+    --tip-bg: #dceae4; --tip-ink: #0a0f0e;
+  }
+  /* --- Studio: neutral chrome, so every colour on screen is data --------- */
+  :root[data-ui="studio"] {
+    color-scheme: dark;
+    --font-head: Archivo, "Helvetica Neue", Arial, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px; --radius: 13px; --radius-sm: 10px; --panel-border: 1px;
+    --label-case: none; --label-space: 0.04em; --head-scale: 1;
+    --bg: #161519; --surface: #1e1d22; --surface-2: #26252c;
+    --ink: #efebe4; --ink-2: #bab5ae; --muted: #8b8780;
+    --line: #33313a; --grid: #2a2830;
+    --accent: #e3d8c6; --accent-ink: #efe6d7; --accent-soft: #2d2a26; --on-accent: #1b1a1e;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #4cbd76; --bad: #e2705f; --good-soft: #1d2a22; --bad-soft: #2e1e1b;
+    --tip-bg: #efebe4; --tip-ink: #161519;
+  }
+  /* --- Blueprint: a drawing sheet, grid and all ------------------------- */
+  :root[data-ui="blueprint"] {
+    color-scheme: dark;
+    --font-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15px; --radius: 3px; --radius-sm: 2px; --panel-border: 1px;
+    --label-case: uppercase; --label-space: 0.07em; --head-scale: 1.02;
+    --bg: #082036; --surface: #0c2b47; --surface-2: #123855;
+    --ink: #dbeaf7; --ink-2: #a7c4dd; --muted: #7ba0c0;
+    --line: #1d4b71; --grid: #123a58;
+    --accent: #4fb0e0; --accent-ink: #86caee; --accent-soft: #0e3a59; --on-accent: #05192b;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #46b862; --bad: #e8695c; --good-soft: #10352a; --bad-soft: #35201d;
+    --tip-bg: #dbeaf7; --tip-ink: #082036;
+  }
+  :root[data-ui="blueprint"] body {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  /* --- Daylight: the friendliest reading of the same content ------------- */
+  :root[data-ui="daylight"] {
+    color-scheme: light;
+    --font-head: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-body: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 16.5px; --radius: 16px; --radius-sm: 12px; --panel-border: 2px;
+    --label-case: none; --label-space: 0.02em; --head-scale: 1.04;
+    --bg: #f1f6f8; --surface: #ffffff; --surface-2: #e6eff3;
+    --ink: #15303d; --ink-2: #3f5c6b; --muted: #6f8f9e;
+    --line: #cbdee6; --grid: #e2edf2;
+    --accent: #0b7285; --accent-ink: #08596a; --accent-soft: #ddf0f4; --on-accent: #ffffff;
+    --s1: #1baf7a; --s2: #eb6834; --s3: #2a78d6; --s4: #eda100;
+    --good: #1a7f37; --bad: #c0392b; --good-soft: #e2f1e6; --bad-soft: #fae7e4;
+    --tip-bg: #15303d; --tip-ink: #ffffff;
+  }
+  /* --- Chalkboard: the lecture-room version ------------------------------ */
+  :root[data-ui="chalkboard"] {
+    color-scheme: dark;
+    --font-head: Caveat, "Bradley Hand", cursive;
+    --font-body: Nunito, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --fs: 15.5px; --radius: 8px; --radius-sm: 6px; --panel-border: 1px;
+    --label-case: none; --label-space: 0.03em; --head-scale: 1.5;
+    --bg: #22302a; --surface: #2a3a33; --surface-2: #32443c;
+    --ink: #f4f1e4; --ink-2: #d3dac9; --muted: #9aa895;
+    --line: #3d5148; --grid: #334640;
+    --accent: #f0d264; --accent-ink: #f6e492; --accent-soft: #3b4634; --on-accent: #22302a;
+    --s1: #199e70; --s2: #d95926; --s3: #3987e5; --s4: #c98500;
+    --good: #6cc47f; --bad: #e8806b; --good-soft: #2b3f31; --bad-soft: #402924;
+    --tip-bg: #f4f1e4; --tip-ink: #22302a;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+  .mono, code { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  a { color: var(--accent-ink); }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { display: grid; grid-template-columns: 258px minmax(0, 1fr); min-height: 100vh; }
+  .side { border-right: 1px solid var(--line); background: var(--surface); padding: 20px 14px 32px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .brand { padding: 0 8px 12px; }
+  .brand h1 { font-size: calc(20px * var(--head-scale)); font-weight: 700; letter-spacing: -0.01em; }
+  .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  .nav-part { margin: 14px 0 3px; padding: 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); }
+  .nav a { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font-size: 13.5px; }
+  .nav a:hover { background: var(--surface-2); color: var(--ink); }
+  .nav a.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .nav a .n { width: 21px; height: 21px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10.5px; font-weight: 600; background: var(--surface-2); color: var(--ink-2); flex: none; }
+  .nav a.active .n { background: var(--accent); color: var(--on-accent); }
+
+  .main { padding: 28px 34px 60px; max-width: 1200px; }
+  .eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--accent-ink); margin-bottom: 7px; }
+  .panel h2 { font-size: calc(29px * var(--head-scale)); font-weight: 700; line-height: 1.16; letter-spacing: -0.01em; margin-bottom: 9px; }
+  .idea { font-size: 16px; color: var(--ink-2); max-width: 68ch; margin: 0 0 20px; }
+
+  .lab { display: grid; grid-template-columns: 296px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .controls { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 15px 17px; display: grid; gap: 13px; position: sticky; top: 18px; }
+  .controls h3 { font-family: var(--font-body); font-size: 11px; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); font-weight: 600; }
+  .ctl > label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); margin-bottom: 3px; }
+  .ctl output { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .ctl input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
+  .seg { display: flex; flex-wrap: wrap; gap: 5px; }
+  .seg button { padding: 4px 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); border-radius: 999px; cursor: pointer; font-size: 12.5px; }
+  .seg button:hover { border-color: var(--accent); }
+  .seg button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn { padding: 7px 13px; border-radius: var(--radius-sm); border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); cursor: pointer; font-weight: 600; font-size: 13px; }
+  .btn.ghost { background: transparent; color: var(--accent-ink); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+
+  .charts { display: grid; gap: 12px; min-width: 0; }
+  .chart { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 11px 12px 7px; min-width: 0; }
+  .chart .t { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin: 0 0 3px 3px; }
+  .chart canvas { width: 100%; display: block; touch-action: pan-y; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+
+  .readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 9px; }
+  .ro { background: var(--surface-2); border-radius: var(--radius-sm); padding: 9px 11px; }
+  .ro .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.25; }
+  .ro .l { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .ro.good { background: var(--good-soft); } .ro.good .v { color: var(--good); }
+  .ro.bad { background: var(--bad-soft); } .ro.bad .v { color: var(--bad); }
+  .ro.accent .v { color: var(--accent-ink); }
+
+  .below { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  .card { border-radius: var(--radius); padding: 15px 17px; }
+  .card b { display: block; font-size: 11px; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); margin-bottom: 5px; }
+  .analogy { background: var(--accent-soft); }
+  .analogy b { color: var(--accent-ink); }
+  .eqcard { background: var(--surface); border: 1px solid var(--line); }
+  .eqcard b, .trycard b { color: var(--muted); }
+  .eqcard .eq { font-family: var(--font-mono); font-size: 13px; line-height: 1.85; overflow-x: auto; }
+  .eqcard .eq .live { color: var(--accent-ink); font-weight: 500; }
+  .trycard { background: var(--surface); border: 1px dashed var(--line); grid-column: 1 / -1; }
+  .trycard ol { margin: 0; padding-left: 19px; color: var(--ink-2); font-size: 14px; }
+  .trycard li { margin: 3px 0; }
+
+  .chain { display: flex; gap: 5px; align-items: stretch; margin: 4px 0 18px; overflow-x: auto; padding-bottom: 5px; }
+  .chain a { flex: 1 0 116px; background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius-sm); padding: 9px 10px; text-decoration: none; color: inherit; }
+  .chain a:hover { border-color: var(--accent); }
+  .chain .k { font-weight: 600; font-size: 13.5px; }
+  .chain .d { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .chain .arrow { align-self: center; color: var(--muted); flex: none; }
+
+  .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 11px; margin-top: 8px; }
+  .home-grid a { display: block; background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 13px 15px; text-decoration: none; color: inherit; }
+  .home-grid a:hover { border-color: var(--accent); }
+  .home-grid .p { font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  .home-grid .h { font-family: var(--font-head); font-size: calc(16.5px * var(--head-scale)); font-weight: 600; margin: 3px 0 3px; }
+  .home-grid .s { font-size: 12.5px; color: var(--ink-2); }
+  .section-label { font-size: 11.5px; font-weight: 600; letter-spacing: calc(0.09em + var(--label-space)); text-transform: var(--label-case); color: var(--muted); margin: 22px 0 8px; }
+
+  .pill { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+  table.steps { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.steps th, table.steps td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+  table.steps th { color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+  table.steps td.m { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  table.steps tr.now td { background: var(--accent-soft); }
+  .tablewrap { overflow-x: auto; }
+
+  .bins { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; margin-top: 4px; }
+  .bins button { height: 24px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface-2); cursor: pointer; padding: 0; }
+  .bins button.on { background: var(--s1); border-color: var(--s1); }
+  .bins button.hum { background: var(--s2); border-color: var(--s2); }
+  .bins button.off { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 3px, var(--line) 3px, var(--line) 5px); }
+
+  .q { background: var(--surface); border: var(--panel-border) solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+  .q p { margin: 0 0 9px; font-weight: 600; }
+  .opts { display: grid; gap: 5px; }
+  .opts button { text-align: left; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .opts button:hover:not(:disabled) { border-color: var(--accent); }
+  .opts button.right { background: var(--good-soft); border-color: var(--good); }
+  .opts button.wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .why { font-size: 13px; color: var(--ink-2); margin-top: 7px; }
+  .foot { margin-top: 34px; color: var(--muted); font-size: 12.5px; max-width: 68ch; }
+
+  .themes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; padding: 2px 8px 0; }
+  .themes button { height: 24px; border-radius: var(--radius-sm); border: 2px solid var(--line); cursor: pointer; padding: 0; position: relative; overflow: hidden; }
+  .themes button.on { border-color: var(--accent); }
+  .themes button i { position: absolute; right: 3px; bottom: 3px; width: 7px; height: 7px; border-radius: 50%; }
+  .theme-note { padding: 5px 8px 2px; font-size: 11.5px; color: var(--muted); line-height: 1.45; min-height: 3.1em; }
+  .hint { padding: 8px 8px 0; margin-top: 6px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); line-height: 2; }
+  .kbd { font-family: var(--font-mono); font-size: 10.5px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; color: var(--ink-2); }
+  .labnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 24px; }
+  .labnav a { text-decoration: none; padding: 9px 14px; border-radius: var(--radius-sm); border: var(--panel-border) solid var(--line); background: var(--surface); color: var(--ink-2); font-size: 13.5px; }
+  .labnav a:hover { border-color: var(--accent); color: var(--ink); }
+  .labnav a.spacer { visibility: hidden; }
+  .lw { display: flex; align-items: center; gap: 7px; }
+  .sweep { border: 1px solid var(--line); background: var(--surface); color: var(--accent-ink); border-radius: 999px; width: 21px; height: 21px; line-height: 1; cursor: pointer; padding: 0; font-size: 9px; flex: none; }
+  .sweep:hover { border-color: var(--accent); }
+  .sweep.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .exitp { position: fixed; top: 10px; right: 14px; z-index: 30; display: none; }
+  :root[data-present] .exitp { display: block; }
+  :root[data-present] { --fs: 17.5px; }
+  :root[data-present] .side { display: none; }
+  :root[data-present] .app { grid-template-columns: minmax(0, 1fr); }
+  :root[data-present] .main { padding: 24px 34px 40px; max-width: none; }
+  :root[data-present] .panel h2 { font-size: calc(34px * var(--head-scale)); }
+  :root[data-present] .idea { font-size: 18px; max-width: 82ch; }
+  :root[data-present] .ro .v { font-size: 23px; }
+
+  @media (max-width: 940px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-part { width: 100%; margin-top: 8px; }
+    .main { padding: 20px 15px 44px; }
+    .lab { grid-template-columns: 1fr; }
+    .controls { position: static; }
+    .two { grid-template-columns: 1fr; }
+    .below { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><h1>ADC Parameter Lab</h1><p>Every datasheet number, live</p></div>
+    <div class="nav-part">Look</div>
+    <div class="themes" id="themes" role="group" aria-label="Interface theme"></div>
+    <div class="theme-note" id="themeNote"></div>
+    <nav class="nav" id="nav" aria-label="Labs"></nav>
+    <div class="hint" id="hints"></div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<button class="btn exitp" id="exitp" type="button">Leave presentation mode</button>
+
+<script>
+(() => {
+'use strict';
+const TWO_PI = 2 * Math.PI;
+
+/* ===================== shared DSP, as used by the slide deck ===================== */
+function linspace(a, b, n) { const o = new Array(n); for (let i = 0; i < n; i++) o[i] = a + (b - a) * i / (n - 1); return o; }
+function quantize(v, bits, vfs) {
+  const lsb = vfs / 2 ** bits, maxC = 2 ** (bits - 1) - 1, minC = -(2 ** (bits - 1));
+  return Math.max(minC, Math.min(maxC, Math.round(v / lsb))) * lsb;
+}
+function snrBits(b) { return 6.02 * b + 1.76; }
+function jitterSnr(f, tj) { return -20 * Math.log10(TWO_PI * f * tj); }
+function bitReverse(i, bits) { let r = 0; for (let b = 0; b < bits; b++) { r = (r << 1) | (i & 1); i >>= 1; } return r; }
+function fft(reIn, imIn) {
+  const N = reIn.length, bits = Math.log2(N), re = new Array(N), im = new Array(N);
+  for (let i = 0; i < N; i++) { const j = bitReverse(i, bits); re[j] = reIn[i]; im[j] = imIn ? imIn[i] : 0; }
+  for (let size = 2; size <= N; size <<= 1) {
+    const half = size >> 1, step = -TWO_PI / size;
+    for (let start = 0; start < N; start += size) for (let k = 0; k < half; k++) {
+      const wr = Math.cos(step * k), wi = Math.sin(step * k), i1 = start + k, i2 = i1 + half;
+      const tr = re[i2] * wr - im[i2] * wi, ti = re[i2] * wi + im[i2] * wr;
+      re[i2] = re[i1] - tr; im[i2] = im[i1] - ti; re[i1] += tr; im[i1] += ti;
+    }
+  }
+  return { re, im };
+}
+function ifft(re, im) { const N = re.length, y = fft(re, im.map(v => -v)); return { re: y.re.map(v => v / N), im: y.im.map(v => -v / N) }; }
+function hann(N) { const w = new Array(N); for (let n = 0; n < N; n++) w[n] = 0.5 * (1 - Math.cos(TWO_PI * n / N)); return w; }
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function gaussian(next) { let s = 0; for (let i = 0; i < 12; i++) s += next(); return s - 6; }
+
+/* ===================== formatting ===================== */
+const SI = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, 'µ'], [1e-9, 'n'], [1e-12, 'p'], [1e-15, 'f']];
+const fmt = {
+  si(v, unit, d) {
+    d = d || 3; unit = unit || '';
+    if (!isFinite(v)) return '–';
+    if (v === 0) return '0 ' + unit;
+    const a = Math.abs(v);
+    for (const [s, pre] of SI) if (a >= s * 0.9995) return trim((v / s).toPrecision(d)) + ' ' + pre + unit;
+    return v.toExponential(2) + ' ' + unit;
+  },
+  n(v, d) { return Number(v).toFixed(d === undefined ? 1 : d); },
+  int(v) { return Math.round(v).toLocaleString('en-US'); },
+};
+function trim(s) { return s.indexOf('.') >= 0 ? s.replace(/\.?0+$/, '') : s; }
+
+/* ===================== theme-aware canvas charts ===================== */
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function niceTicks(min, max, count) {
+  const span = (max - min) || 1, raw = span / (count || 5), mag = 10 ** Math.floor(Math.log10(raw)), r = raw / mag;
+  const step = (r < 1.5 ? 1 : r < 3 ? 2 : r < 7 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(min / step - 1e-9) * step; v <= max + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+let charts = [];
+let sweepTimers = [];
+function makeChart(host, title, height) {
+  height = height || 220;
+  const wrap = document.createElement('div'); wrap.className = 'chart';
+  if (title) { const t = document.createElement('div'); t.className = 't'; t.textContent = title; wrap.appendChild(t); }
+  const canvas = document.createElement('canvas'); canvas.height = height; wrap.appendChild(canvas); host.appendChild(wrap);
+  const ch = { canvas, height, spec: null, hover: null };
+  ch.draw = (spec) => { if (spec) ch.spec = spec; paint(ch); };
+  const move = (clientX) => { const r = canvas.getBoundingClientRect(); ch.hover = clientX - r.left; paint(ch); };
+  canvas.addEventListener('mousemove', e => move(e.clientX));
+  canvas.addEventListener('mouseleave', () => { ch.hover = null; paint(ch); });
+  canvas.addEventListener('touchmove', e => { if (e.touches[0]) move(e.touches[0].clientX); }, { passive: true });
+  canvas.addEventListener('touchend', () => { ch.hover = null; paint(ch); });
+  charts.push(ch);
+  new ResizeObserver(() => paint(ch)).observe(wrap);
+  return ch;
+}
+function paint(ch) {
+  const spec = ch.spec; if (!spec) return;
+  const cv = ch.canvas, W = cv.clientWidth, H = ch.height;
+  if (!W) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const FM = css('--font-mono') || 'monospace', FB = css('--font-body') || 'sans-serif';
+  const C = { ink: css('--ink'), ink2: css('--ink-2'), muted: css('--muted'), grid: css('--grid'), line: css('--line'), surface: css('--surface'), tipBg: css('--tip-bg'), tipInk: css('--tip-ink'), s: [css('--s1'), css('--s2'), css('--s3'), css('--s4')] };
+  const legend = spec.series.filter(s => s.label).length >= 2 ? 18 : 0;
+  const pad = { l: spec.ylabel ? 54 : 42, r: 12, t: 8 + legend, b: spec.xlabel ? 36 : 22 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+  if (pw <= 10 || ph <= 10) return;
+  const live = spec.series.filter(s => s.xs.length);
+  let xmin = spec.xmin, xmax = spec.xmax, ymin = spec.ymin, ymax = spec.ymax;
+  if (xmin === undefined) xmin = Math.min(...live.map(s => Math.min(...s.xs)));
+  if (xmax === undefined) xmax = Math.max(...live.map(s => Math.max(...s.xs)));
+  if (ymin === undefined) ymin = Math.min(0, ...live.map(s => Math.min(...s.ys)));
+  if (ymax === undefined) ymax = Math.max(...live.map(s => Math.max(...s.ys)));
+  if (!(xmax > xmin)) xmax = xmin + 1;
+  if (!(ymax > ymin)) ymax = ymin + 1;
+  const X = v => pad.l + (v - xmin) / (xmax - xmin) * pw;
+  const Y = v => pad.t + (ymax - v) / (ymax - ymin) * ph;
+  const clampY = v => Math.max(ymin - (ymax - ymin), Math.min(ymax + (ymax - ymin), v));
+
+  g.font = '11px ' + FM;
+  g.strokeStyle = C.grid; g.lineWidth = 1; g.fillStyle = C.muted; g.textAlign = 'right'; g.textBaseline = 'middle';
+  for (const t of niceTicks(ymin, ymax, 4)) {
+    const y = Y(t); if (y < pad.t - 1 || y > pad.t + ph + 1) continue;
+    g.beginPath(); g.moveTo(pad.l, y); g.lineTo(W - pad.r, y); g.stroke();
+    g.fillText(spec.yfmt ? spec.yfmt(t) : String(t), pad.l - 6, y);
+  }
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  for (const t of niceTicks(xmin, xmax, spec.xticks || 6)) {
+    const x = X(t); if (x < pad.l - 1 || x > W - pad.r + 1) continue;
+    const lab = spec.xfmt ? spec.xfmt(t) : String(t);
+    if (lab) g.fillText(lab, x, pad.t + ph + 5);
+  }
+  g.strokeStyle = C.line; g.beginPath(); g.moveTo(pad.l, pad.t + ph); g.lineTo(W - pad.r, pad.t + ph); g.stroke();
+  if (ymin < 0 && ymax > 0) { g.beginPath(); g.moveTo(pad.l, Y(0)); g.lineTo(W - pad.r, Y(0)); g.stroke(); }
+
+  g.fillStyle = C.ink2; g.font = '11.5px ' + FB;
+  if (spec.xlabel) { g.textAlign = 'center'; g.textBaseline = 'bottom'; g.fillText(spec.xlabel, pad.l + pw / 2, H - 3); }
+  if (spec.ylabel) { g.save(); g.translate(11, pad.t + ph / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(spec.ylabel, 0, 0); g.restore(); }
+
+  g.save(); g.beginPath(); g.rect(pad.l, pad.t - 3, pw, ph + 6); g.clip();
+  spec.series.forEach((s, si) => {
+    const col = s.color || C.s[si % 4], kind = s.kind || 'line';
+    g.strokeStyle = col; g.fillStyle = col; g.lineWidth = s.width || 2;
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    if (kind === 'bar') {
+      const n = s.xs.length, bw = Math.max(1.5, pw / Math.max(n, 1) * 0.7), y0 = Y(Math.max(ymin, 0));
+      for (let i = 0; i < n; i++) {
+        const y = Y(clampY(s.ys[i])), top = Math.min(y, y0), h = Math.abs(y0 - y);
+        if (h < 0.4) continue;
+        g.beginPath(); g.roundRect(X(s.xs[i]) - bw / 2, top, bw, h, [Math.min(3, bw / 2), Math.min(3, bw / 2), 0, 0]); g.fill();
+      }
+    } else if (kind === 'stem') {
+      const y0 = Y(Math.max(ymin, Math.min(ymax, 0)));
+      // Sample markers carry the lesson in several labs, so keep them solid
+      // enough to read on the dark themes as well as the light ones.
+      g.lineWidth = 2;
+      for (let i = 0; i < s.xs.length; i++) {
+        const x = X(s.xs[i]), y = Y(clampY(s.ys[i]));
+        g.beginPath(); g.moveTo(x, y0); g.lineTo(x, y); g.stroke();
+        g.beginPath(); g.arc(x, y, 3.5, 0, TWO_PI); g.fill();
+      }
+    } else {
+      if (kind !== 'dots') {
+        g.beginPath();
+        for (let i = 0; i < s.xs.length; i++) {
+          const x = X(s.xs[i]), y = Y(clampY(s.ys[i]));
+          if (i === 0) g.moveTo(x, y);
+          else if (kind === 'step') { g.lineTo(x, Y(clampY(s.ys[i - 1]))); g.lineTo(x, y); }
+          else g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+      if (kind === 'dots' || s.dots) {
+        const r = s.r || 3.5;
+        for (let i = 0; i < s.xs.length; i++) {
+          g.beginPath(); g.arc(X(s.xs[i]), Y(clampY(s.ys[i])), r, 0, TWO_PI); g.fill();
+          g.strokeStyle = C.surface; g.lineWidth = 1.5; g.stroke(); g.strokeStyle = col;
+        }
+      }
+    }
+  });
+  g.restore();
+
+  const labelled = spec.series.filter(s => s.label);
+  if (legend) {
+    g.font = '11.5px ' + FB; g.textBaseline = 'middle'; g.textAlign = 'left';
+    let x = pad.l, y = 9;
+    labelled.forEach(s => {
+      const col = s.color || C.s[spec.series.indexOf(s) % 4], w = g.measureText(s.label).width;
+      if (x + 16 + w > W - pad.r) return;
+      g.fillStyle = col; g.beginPath(); g.roundRect(x, y - 4, 13, 8, 2); g.fill();
+      g.fillStyle = C.ink2; g.fillText(s.label, x + 17, y); x += 17 + w + 14;
+    });
+  }
+
+  if (ch.hover !== null && spec.tip) {
+    const hi = spec.tipSeries || 0, hs = spec.series[hi];
+    if (hs && hs.xs.length && ch.hover >= pad.l && ch.hover <= W - pad.r) {
+      const xv = xmin + (ch.hover - pad.l) / pw * (xmax - xmin);
+      let bi = 0, bd = Infinity;
+      for (let i = 0; i < hs.xs.length; i++) { const d = Math.abs(hs.xs[i] - xv); if (d < bd) { bd = d; bi = i; } }
+      const x = X(hs.xs[bi]), y = Y(clampY(hs.ys[bi]));
+      g.strokeStyle = C.muted; g.lineWidth = 1; g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, pad.t + ph); g.stroke(); g.setLineDash([]);
+      g.fillStyle = hs.color || C.s[hi % 4]; g.beginPath(); g.arc(x, y, 4.5, 0, TWO_PI); g.fill();
+      g.strokeStyle = C.surface; g.lineWidth = 2; g.stroke();
+      const lines = spec.tip(bi, hs).filter(Boolean);
+      if (lines.length) {
+        g.font = '12px ' + FM;
+        const w = Math.max(...lines.map(l => g.measureText(l).width)) + 16, h = lines.length * 16 + 10;
+        let tx = x + 12, ty = pad.t + 4;
+        if (tx + w > W - pad.r) tx = Math.max(pad.l, x - 12 - w);
+        g.fillStyle = C.tipBg; g.beginPath(); g.roundRect(tx, ty, w, h, 6); g.fill();
+        g.fillStyle = C.tipInk; g.textAlign = 'left'; g.textBaseline = 'top';
+        lines.forEach((l, i) => g.fillText(l, tx + 8, ty + 6 + i * 16));
+      }
+    }
+  }
+}
+const repaintAll = () => charts.forEach(paint);
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+if (mq.addEventListener) mq.addEventListener('change', repaintAll);
+new MutationObserver(repaintAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-ui', 'data-present'] });
+
+/* ===================== small UI builders ===================== */
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; }
+function slider(host, label, opts) {
+  const wrap = el('div', 'ctl'), lab = el('label'), out = el('output'), right = el('span', 'lw');
+  const inp = document.createElement('input');
+  inp.type = 'range'; inp.min = opts.min; inp.max = opts.max; inp.step = opts.step; inp.value = opts.log ? Math.log10(opts.value) : opts.value;
+  inp.setAttribute('aria-label', label);
+  const get = () => opts.log ? 10 ** Number(inp.value) : Number(inp.value);
+  const show = () => { out.textContent = opts.fmt(get()); };
+  right.appendChild(out);
+  if (opts.sweep) {
+    // Runs the slider end to end on its own, so the room can watch the effect
+    // instead of watching someone drag.
+    const play = el('button', 'sweep', '▶');
+    play.type = 'button';
+    play.title = 'Sweep this control automatically';
+    play.setAttribute('aria-label', 'Sweep ' + label + ' automatically');
+    let timer = null, dir = 1;
+    const stop = () => { clearInterval(timer); timer = null; play.classList.remove('on'); play.textContent = '▶'; play.title = 'Sweep this control automatically'; };
+    const tick = () => {
+      const lo = Number(inp.min), hi = Number(inp.max), st = Number(inp.step) || 1;
+      let v = Number(inp.value) + dir * st;
+      if (v >= hi) { v = hi; dir = -1; } else if (v <= lo) { v = lo; dir = 1; }
+      inp.value = v; show(); opts.on(get());
+    };
+    play.addEventListener('click', () => {
+      if (timer) { stop(); return; }
+      timer = setInterval(tick, 45); sweepTimers.push(timer);
+      play.classList.add('on'); play.textContent = '❚❚'; play.title = 'Stop the sweep';
+    });
+    inp.addEventListener('pointerdown', stop);
+    right.appendChild(play);
+  }
+  lab.append(el('span', null, label), right);
+  wrap.append(lab, inp); host.appendChild(wrap);
+  show();
+  return { get, set(v) { inp.value = opts.log ? Math.log10(v) : v; show(); } };
+}
+function segmented(host, label, items, value, on) {
+  const wrap = el('div', 'ctl');
+  if (label) wrap.appendChild(el('label', null, '<span>' + label + '</span>'));
+  const seg = el('div', 'seg');
+  const btns = items.map(it => {
+    const b = el('button', JSON.stringify(it.value) === JSON.stringify(value) ? 'on' : '', it.label);
+    b.type = 'button';
+    b.addEventListener('click', () => { btns.forEach(x => x.classList.remove('on')); b.classList.add('on'); on(it.value); });
+    seg.appendChild(b); return b;
+  });
+  wrap.appendChild(seg); host.appendChild(wrap);
+  return { select(v) { btns.forEach((b, i) => b.classList.toggle('on', JSON.stringify(items[i].value) === JSON.stringify(v))); } };
+}
+function buttons(host, defs) {
+  const row = el('div', 'seg');
+  const made = defs.map(d => { const b = el('button', 'btn' + (d.ghost ? ' ghost' : ''), d.label); b.addEventListener('click', d.on); row.appendChild(b); return b; });
+  host.appendChild(row); return made;
+}
+function readouts(host, defs) {
+  const grid = el('div', 'readouts'), map = {};
+  defs.forEach(d => {
+    const ro = el('div', 'ro' + (d.cls ? ' ' + d.cls : '')), v = el('div', 'v', '–'), l = el('div', 'l', d.label);
+    ro.append(v, l); grid.appendChild(ro); map[d.key] = { v, ro, base: 'ro' + (d.cls ? ' ' + d.cls : '') };
+  });
+  host.appendChild(grid);
+  return { set(key, text, state) { const m = map[key]; m.v.textContent = text; if (state !== undefined) m.ro.className = m.base + (state ? ' ' + state : ''); } };
+}
+function panel(main, eyebrow, title, idea) {
+  const p = el('section', 'panel');
+  p.append(el('div', 'eyebrow', eyebrow), el('h2', null, title), el('p', 'idea', idea));
+  main.appendChild(p); return p;
+}
+function labLayout(p) {
+  const lab = el('div', 'lab'), controls = el('div', 'controls'), out = el('div', 'charts');
+  controls.appendChild(el('h3', null, 'Controls'));
+  lab.append(controls, out); p.appendChild(lab);
+  return { controls, out };
+}
+function below(p, analogy, tries) {
+  const b = el('div', 'below');
+  b.appendChild(el('div', 'card analogy', '<b>Think of it like this</b>' + analogy));
+  const eq = el('div', 'card eqcard', '<b>The equation, with your numbers</b><div class="eq"></div>');
+  b.appendChild(eq);
+  if (tries) b.appendChild(el('div', 'card trycard', '<b>Try this</b><ol>' + tries.map(t => '<li>' + t + '</li>').join('') + '</ol>'));
+  p.appendChild(b);
+  const eqEl = eq.querySelector('.eq');
+  return html => { eqEl.innerHTML = html; };
+}
+const hi = v => '<span class="live">' + v + '</span>';
+function note(host, text) { host.appendChild(el('div', 'chart', '<div class="t">Reading the chart</div><div style="font-size:13px;color:var(--ink-2)">' + text + '</div>')); }
+
+/* ===================== ADC parameter maths ===================== */
+// Mirrors src/adc.js, the same engine that generated the slide deck.
+function lsbOf(bits, fsr) { return fsr / 2 ** bits; }
+function codesOf(bits) { return 2 ** bits; }
+function idealSnr(bits) { return 6.02 * bits + 1.76; }
+function enobFromSinad(sinad, backoff) { return (sinad - 1.76 + (backoff || 0)) / 6.02; }
+function jitterSnrAdc(f, tj) { return -20 * Math.log10(TWO_PI * f * tj); }
+function jitterBudget(f, bits) { return 1 / (TWO_PI * f * 10 ** (idealSnr(bits) / 20)); }
+function settlingTaus(bits) { return Math.log(2 ** (bits + 1)); }
+function settleErrorLsb(t, tau, bits) { return 2 ** bits * Math.exp(-t / tau); }
+function slewNeeded(fsr, f) { return Math.PI * fsr * f; }
+function waldenFoM(p, enob, fs) { return p / (2 ** enob * fs); }
+function schreierFoM(sndr, bw, p) { return sndr + 10 * Math.log10(bw / p); }
+function noiseFreeBits(bits, rms) { return rms <= 0 ? bits : Math.log2(codesOf(bits) / (6.6 * rms)); }
+function effResBits(bits, rms) { return rms <= 0 ? bits : Math.log2(codesOf(bits) / rms); }
+
+/** Code transition voltages for a converter carrying static errors. */
+function transitions(bits, opt, fsr) {
+  const q = lsbOf(bits, fsr), n = codesOf(bits) - 1, out = new Array(n);
+  let acc = 0;
+  for (let k = 0; k < n; k++) {
+    acc += 1 + (opt.dnl ? opt.dnl[k] : 0);
+    out[k] = ((opt.offsetLsb || 0) + acc - 0.5) * q * (1 + (opt.gainErr || 0)) - fsr / 2;
+  }
+  return out;
+}
+/** DNL and INL in LSB, plus the two guarantees that follow from them. */
+function linearity(trans, bits, fsr) {
+  const q = lsbOf(bits, fsr), n = trans.length, widths = [];
+  for (let k = 0; k < n - 1; k++) widths.push((trans[k + 1] - trans[k]) / q);
+  const avg = (trans[n - 1] - trans[0]) / q / (n - 1);
+  const dnl = widths.map(w => w / avg - 1), inl = [];
+  let s = 0;
+  for (const d of dnl) { s += d; inl.push(s); }
+  return {
+    dnl, inl,
+    dnlMax: Math.max(...dnl.map(Math.abs)), inlMax: Math.max(...inl.map(Math.abs)),
+    missing: dnl.some(d => d <= -0.999), monotonic: widths.every(w => w > 0),
+  };
+}
+function quantizeFsr(v, bits, fsr) {
+  const q = lsbOf(bits, fsr), hi = 2 ** (bits - 1) - 1, lo = -(2 ** (bits - 1));
+  return Math.max(lo, Math.min(hi, Math.round(v / q))) * q;
+}
+function powerSpectrum(x) {
+  const N = x.length, X = fft(x, new Array(N).fill(0)), p = new Array(N / 2);
+  for (let k = 0; k < N / 2; k++) p[k] = (X.re[k] ** 2 + X.im[k] ** 2) / (N * N / 4);
+  return p;
+}
+function harmonicBin(m, h, N) { let b = (m * h) % N; if (b > N / 2) b = N - b; return b; }
+
+/** One coherently sampled record carrying the impairments asked for. */
+function capture(o) {
+  const bits = o.bits, N = o.N, m = o.m, amp = o.amp, fs = o.fs || 1e8;
+  const next = rng(o.seed || 7), q = lsbOf(bits, 2), fin = m / N * fs, x = new Array(N);
+  const a2 = 10 ** ((o.hd2 !== undefined ? o.hd2 : -999) / 20);
+  const a3 = 10 ** ((o.hd3 !== undefined ? o.hd3 : -999) / 20);
+  for (let n = 0; n < N; n++) {
+    const tj = o.jitter ? o.jitter * gaussian(next) : 0;
+    const ph = TWO_PI * fin * (n / fs + tj);
+    let v = amp * Math.sin(ph) + amp * a2 * Math.sin(2 * ph + 0.4) + amp * a3 * Math.sin(3 * ph + 1.1);
+    if (o.noiseLsb) v += o.noiseLsb * q * gaussian(next);
+    x[n] = quantizeFsr(Math.max(-1, Math.min(0.999999, v)), bits, 2);
+  }
+  return x;
+}
+/** Every AC figure of merit from one record. */
+function acMetrics(x, m, amp) {
+  const N = x.length, p = powerSpectrum(x), skirt = 1;
+  const isSig = k => Math.abs(k - m) <= skirt, hB = new Set();
+  for (let h = 2; h <= 9; h++) {
+    const b = harmonicBin(m, h, N);
+    if (b > skirt && !isSig(b)) for (let d = -skirt; d <= skirt; d++) hB.add(b + d);
+  }
+  let pSig = 0, pH = 0, pN = 0, spur = 0, spurBin = -1;
+  for (let k = 1; k < N / 2; k++) {
+    if (isSig(k)) { pSig += p[k]; continue; }
+    if (hB.has(k)) pH += p[k]; else pN += p[k];
+    if (p[k] > spur) { spur = p[k]; spurBin = k; }
+  }
+  const db = r => 10 * Math.log10(Math.max(r, 1e-30));
+  const backoff = -20 * Math.log10(Math.max(amp, 1e-9));
+  const sinad = db(pSig / (pN + pH));
+  return {
+    snr: db(pSig / pN), sinad, thd: db(pH / pSig), sfdr: db(pSig / spur), spurBin,
+    enob: enobFromSinad(sinad, backoff), backoff,
+    harmonics: [2, 3, 4, 5].map(h => ({ h, bin: harmonicBin(m, h, N), db: db((p[harmonicBin(m, h, N)] || 0) / pSig) })),
+    spectrumDb: p.map(v => 10 * Math.log10(Math.max(v, 1e-30))),
+  };
+}
+
+/* ===================== every parameter, for the reference table ===================== */
+const PARAMS = [
+  ['static', 'Resolution', 'N', 'bits', 'Number of bits in the output word; the converter can report 2ᴺ levels.', 'Sets the finest step possible. Says nothing about accuracy.'],
+  ['static', 'Full-scale range', 'V_FS, FSR', 'V', 'Input span between the lowest and highest code.', 'Exceed it and the signal clips, spraying harmonics.'],
+  ['static', 'LSB (step size)', 'q', 'V', 'FSR ÷ 2ᴺ: the voltage between neighbouring codes.', 'The unit every other parameter is quoted in.'],
+  ['static', 'Quantisation error', 'e_q', 'LSB', 'Difference between input and reported level; within ±½ LSB.', 'Behaves like noise of power LSB²/12.'],
+  ['static', 'Offset error', 'E_O', 'LSB, mV', 'The whole staircase shifted sideways.', 'Same error everywhere; removed by one-point calibration.'],
+  ['static', 'Gain error', 'E_G', '% FS', 'The staircase has the wrong slope.', 'Error grows with signal; two-point calibration fixes it.'],
+  ['static', 'DNL', 'DNL', 'LSB', 'How much each individual step differs from one ideal LSB.', 'Adds to the noise floor and creates spurs.'],
+  ['static', 'INL', 'INL', 'LSB', 'How far the whole curve bows from a straight line; the running sum of DNL.', 'Sets the distortion floor, so it caps SFDR.'],
+  ['static', 'Missing code', '—', 'pass/fail', 'A code that can never appear, caused by DNL ≤ −1 LSB.', 'Fatal in measurement work.'],
+  ['static', 'Monotonicity', '—', 'pass/fail', 'A rising input never produces a falling output.', 'Essential in any feedback loop; without it loops latch up.'],
+  ['static', 'Total unadjusted error', 'TUE', 'LSB', 'All static errors combined with no calibration applied.', 'The only accuracy figure that means anything uncalibrated.'],
+  ['static', 'Offset drift', '—', 'µV/°C', 'How the offset moves with temperature.', 'Survives room-temperature calibration.'],
+  ['static', 'Gain drift', '—', 'ppm/°C', 'How the gain moves with temperature.', 'Usually the accuracy limit above 12 bits.'],
+  ['static', 'Reference voltage', 'V_ref', 'V', 'The standard the input is compared against.', 'Reference error is gain error, one for one.'],
+  ['static', 'PSRR', 'PSRR', 'dB', 'Rejection of wobble on the supply rail.', 'Falls with frequency; check it at your regulator’s frequency.'],
+  ['static', 'CMRR', 'CMRR', 'dB', 'Rejection of voltage common to both differential inputs.', 'Decides how well ground noise is ignored.'],
+  ['dynamic', 'SNR', 'SNR', 'dB', 'Signal above the noise, harmonics excluded.', 'Ideal is 6.02N + 1.76 dB; the gap to it is the honest quality measure.'],
+  ['dynamic', 'Input-referred noise', 'σ_n', 'LSB rms', 'Spread of codes with the input shorted.', 'Decides how many of your bits are real.'],
+  ['dynamic', 'Noise-free resolution', 'NFR', 'bits', 'log₂(2ᴺ / 6.6σ): codes that never flicker.', 'The honest resolution of a precision converter.'],
+  ['dynamic', 'Effective resolution', '—', 'bits', 'log₂(2ᴺ / σ): the rms version, ~2.7 bits more generous.', 'Check which one a datasheet quotes.'],
+  ['dynamic', 'THD', 'THD', 'dBc, %', 'All harmonics added together, relative to the tone.', 'Comes from INL; harmonics fold back in-band.'],
+  ['dynamic', 'HD2, HD3', 'HD2, HD3', 'dBc', 'The individual second and third harmonics.', 'HD2 points to imbalance, HD3 to compression.'],
+  ['dynamic', 'SINAD', 'SINAD, SNDR', 'dB', 'Signal over noise and distortion together.', 'The honest one; ENOB is computed from it.'],
+  ['dynamic', 'ENOB', 'ENOB', 'bits', '(SINAD − 1.76 + back-off) / 6.02.', 'Always falls with input frequency: meaningless without one.'],
+  ['dynamic', 'SFDR', 'SFDR', 'dBc, dBFS', 'Gap from the tone to the largest single spur.', 'Decides whether a weak signal survives beside a strong one.'],
+  ['dynamic', 'IMD2, IMD3', 'IMD', 'dBc', 'Products created when two tones mix in the nonlinearity.', 'Third-order products land in-band where no filter reaches.'],
+  ['dynamic', 'FFT noise floor', '—', 'dBFS', '−SNR − 10 log₁₀(N/2): the per-bin level.', 'Moves with transform length; never compare across lengths.'],
+  ['dynamic', 'Processing gain', '—', 'dB', '10 log₁₀(N/2): how far an FFT pushes the floor down.', 'Makes a converter look better than it is.'],
+  ['dynamic', 'Dynamic range', 'DR', 'dB', 'Largest usable signal over the smallest detectable one.', 'Decides whether you need automatic gain control.'],
+  ['timing', 'Sample rate', 'f_s', 'SPS', 'Complete conversions delivered per second.', 'Must exceed 2 × the highest frequency present.'],
+  ['timing', 'Conversion time', 't_conv', 's', 'How long one measurement takes.', 'Not the same as latency.'],
+  ['timing', 'Latency', '—', 'cycles', 'Delay before a given sample appears at the output.', 'Irrelevant for spectra, fatal in fast control loops.'],
+  ['timing', 'Aperture delay', 't_AD', 's', 'Fixed gap between clock edge and the switch opening.', 'Harmless alone; mismatch ruins interleaving.'],
+  ['timing', 'Aperture jitter', 't_j', 's rms', 'Random variation in when the switch opens.', 'Limits SNR to −20 log₁₀(2π f_in t_j); uses input frequency.'],
+  ['timing', 'Acquisition time', 't_acq', 's', 'Time for the hold capacitor to reach the input.', 'Sets the bandwidth your driving amplifier needs.'],
+  ['timing', 'Settling time', 't_s', 's', 'Time to settle within ½ LSB: ln(2^(N+1)) time constants.', 'Under-settling looks exactly like distortion.'],
+  ['timing', 'Slew rate', 'SR', 'V/µs', 'How fast the driver can move; π × FSR × f is needed.', 'Too little flattens peaks and makes HD3.'],
+  ['timing', 'Overvoltage recovery', 't_rec', 's', 'Time to behave again after being driven past full scale.', 'Matters in radar and pulsed systems.'],
+  ['bandwidth', 'Analog input bandwidth', 'BW₋₃dB', 'Hz', 'Where the front end’s response has fallen 3 dB.', 'Independent of sample rate; often several times higher.'],
+  ['bandwidth', 'Full-power bandwidth', 'FPBW', 'Hz', 'Where a full-scale input has dropped 3 dB.', 'Lower than the small-signal figure.'],
+  ['bandwidth', 'Full-linear bandwidth', 'FLBW', 'Hz', 'Up to where distortion specs are still met.', 'The only bandwidth you can actually design to.'],
+  ['bandwidth', 'Oversampling ratio', 'OSR', '×', 'f_s ÷ 2·BW: how much faster than necessary.', '+3 dB per doubling, (6L+3) dB with L-th order shaping.'],
+  ['bandwidth', 'Decimation', '—', '×', 'Digital filtering and rate reduction after oversampling.', 'Where the noise you spread out gets thrown away.'],
+  ['system', 'Power dissipation', 'P_D', 'W', 'Total across analogue, digital and I/O supplies.', 'Roughly 4× per extra bit at the same rate.'],
+  ['system', 'Walden FoM', 'FoM_W', 'J/step', 'P / (2^ENOB × f_s). Lower is better.', 'Fair comparison for fast, low-resolution parts.'],
+  ['system', 'Schreier FoM', 'FoM_S', 'dB', 'SNDR + 10 log₁₀(BW/P). Higher is better.', 'Fair comparison for slow, high-resolution parts.'],
+  ['system', 'Crosstalk', '—', 'dB', 'Leakage from one channel into another.', 'Worsens with frequency; multiplexers add settling crosstalk.'],
+  ['system', 'Output coding', '—', 'format', 'Straight binary, offset binary, two’s complement or Gray.', 'Reading the wrong one makes clean signals look broken.'],
+  ['system', 'Digital interface', '—', '—', 'SPI, parallel CMOS, LVDS or JESD204B/C.', 'Set by data rate; digital noise can couple into the analogue.'],
+];
+const FAMILY_NAME = { static: 'Static (DC)', dynamic: 'Dynamic (AC)', timing: 'Timing', bandwidth: 'Bandwidth', system: 'Power and system' };
+const FAMILY_WHEN = {
+  static: 'Measuring slow or steady voltages',
+  dynamic: 'Any signal that moves: radio, audio, vibration',
+  timing: 'Fast inputs, control loops, interleaving',
+  bandwidth: 'Undersampling, wideband or high-IF work',
+  system: 'Budgets, board design, multi-channel',
+};
+
+/* ===================== labs ===================== */
+const LABS = [];
+const lab = def => LABS.push(def);
+
+lab({ id: 'home', part: 'Start', nav: 'Overview', build(main) {
+  const p = panel(main, 'Start here', 'Every parameter on an ADC datasheet',
+    'Twelve laboratories, one family of parameters at a time. Move a slider and the staircase bends, the spectrum grows spurs, the numbers update. The last lab is a searchable reference to all ' + PARAMS.length + ' parameters.');
+  const two = el('div', 'two'); p.appendChild(two);
+  const chS = makeChart(two, 'The transfer function: a real converter’s staircase', 190);
+  const chF = makeChart(two, 'The spectrum: where its imperfections show up', 190);
+  const bits = 4, fsr = 2, v = linspace(-1, 1, 240), next = rng(5);
+  const dnl = Array.from({ length: codesOf(bits) - 1 }, () => 0.3 * gaussian(next) * 0.4);
+  const tr = transitions(bits, { dnl, offsetLsb: 0.6 }, fsr);
+  const q = v.map(x => { let c = 0; for (let k = 0; k < tr.length; k++) if (x >= tr[k]) c = k + 1; return (c - codesOf(bits) / 2 + 0.5) * lsbOf(bits, fsr); });
+  chS.draw({ series: [{ xs: v, ys: v, label: 'ideal', color: css('--muted'), width: 1.5 }, { xs: v, ys: q, kind: 'step', label: 'real, with offset and DNL' }],
+    ymin: -1.1, ymax: 1.1, xlabel: 'input (V)', tip: (i, s) => ['in ' + v[i].toFixed(3) + ' V', 'out ' + s.ys[i].toFixed(3) + ' V'] });
+  const cap = capture({ bits: 12, N: 2048, m: 111, amp: 0.9, hd2: -68, hd3: -74, seed: 21 });
+  const r = acMetrics(cap, 111, 0.9);
+  chF.draw({ series: [{ xs: r.spectrumDb.slice(0, 512).map((_, i) => i), ys: r.spectrumDb.slice(0, 512), width: 1.25 }],
+    ymin: -130, ymax: 5, xlabel: 'FFT bin', ylabel: 'dBFS', tip: (i, s) => ['bin ' + i, s.ys[i].toFixed(1) + ' dB'] });
+
+  p.appendChild(el('div', 'section-label', 'The five families · click one to jump to its labs'));
+  const grid = el('div', 'home-grid');
+  Object.keys(FAMILY_NAME).forEach(k => {
+    const n = PARAMS.filter(x => x[0] === k).length;
+    const a = el('a', null, '<div class="p">' + n + ' parameters</div><div class="h">' + FAMILY_NAME[k] + '</div><div class="s">' + FAMILY_WHEN[k] + '</div>');
+    a.href = '#reference'; grid.appendChild(a);
+  });
+  p.appendChild(grid);
+
+  p.appendChild(el('div', 'section-label', 'All twelve labs'));
+  const g2 = el('div', 'home-grid');
+  LABS.filter(l => l.id !== 'home').forEach(l => {
+    const a = el('a', null, '<div class="p">' + l.part + '</div><div class="h">' + l.nav + '</div><div class="s">' + (l.blurb || '') + '</div>');
+    a.href = '#' + l.id; g2.appendChild(a);
+  });
+  p.appendChild(g2);
+  p.appendChild(el('p', 'foot', 'Companion to the "Inside the ADC" talk. Every chart is computed live by the same transfer-function, FFT and figure-of-merit code that generated the slide deck.'));
+}});
+
+lab({ id: 'transfer', part: 'Static (DC)', nav: 'Transfer function', blurb: 'Resolution, LSB, offset, gain, DNL, INL — all on one staircase.', build(main) {
+  const p = panel(main, 'Static accuracy', 'The transfer function, with every static error on one slider',
+    'This is the whole of DC accuracy in one picture. Bend the staircase with offset, gain, DNL and INL and watch the derived numbers — missing codes, monotonicity, total unadjusted error — decide themselves.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 5, offset: 0, gain: 0, dnlAmp: 0, inlAmp: 0, seed: 5 };
+  const chS = makeChart(out, 'Transfer function: ideal against real', 210);
+  const two = el('div', 'two'); out.appendChild(two);
+  const chD = makeChart(two, 'DNL — width error of each step', 180);
+  const chI = makeChart(two, 'INL — how far the curve bows', 180);
+  const ro = readouts(out, [{ key: 'lsb', label: 'one step (LSB), 2 V range' }, { key: 'dnl', label: 'worst DNL', cls: 'accent' },
+    { key: 'inl', label: 'worst INL' }, { key: 'miss', label: 'missing codes?' }, { key: 'mono', label: 'monotonic?' }, { key: 'tue', label: 'total unadjusted error' }]);
+  const setEq = below(p, 'A ruler. Resolution is how many marks it has, offset is the ruler starting in the wrong place, gain is the ruler having stretched, DNL is marks unevenly spaced, and INL is the whole ruler gently bowed.',
+    ['Set DNL to maximum: watch a code go missing and the monotonic guarantee fail.',
+     'Add offset only: DNL and INL stay at zero. Static errors are independent of each other.',
+     'Add INL with zero DNL: each step is still perfect, yet the curve bends — that bend is what caps SFDR.']);
+  function draw() {
+    const bits = st.bits, fsr = 2, n = codesOf(bits) - 1, next = rng(st.seed);
+    const dnl = Array.from({ length: n }, (_, i) =>
+      st.dnlAmp * gaussian(next) * 0.4 + st.inlAmp * (Math.PI / n) * Math.cos((Math.PI * i) / n) * 2);
+    const tr = transitions(bits, { dnl, offsetLsb: st.offset, gainErr: st.gain }, fsr);
+    const L = linearity(tr, bits, fsr);
+    const v = linspace(-1, 1, 300);
+    const q = v.map(x => { let c = 0; for (let k = 0; k < tr.length; k++) if (x >= tr[k]) c = k + 1; return (c - codesOf(bits) / 2 + 0.5) * lsbOf(bits, fsr); });
+    chS.draw({ series: [{ xs: v, ys: v, label: 'ideal', color: css('--muted'), width: 1.5 }, { xs: v, ys: q, kind: 'step', label: bits + '-bit output' }],
+      ymin: -1.15, ymax: 1.15, xlabel: 'input (V)', ylabel: 'output (V)',
+      tipSeries: 1, tip: (i, s) => ['in  ' + v[i].toFixed(3) + ' V', 'out ' + s.ys[i].toFixed(3) + ' V'] });
+    chD.draw({ series: [{ xs: L.dnl.map((_, i) => i), ys: L.dnl, kind: 'bar' }],
+      ymin: -1.3, ymax: 1.3, xlabel: 'code', ylabel: 'LSB', tip: (i, s) => ['code ' + i, s.ys[i].toFixed(3) + ' LSB'] });
+    chI.draw({ series: [{ xs: L.inl.map((_, i) => i), ys: L.inl, color: css('--s4') }],
+      xlabel: 'code', ylabel: 'LSB', tip: (i, s) => ['code ' + i, s.ys[i].toFixed(3) + ' LSB'] });
+    const tue = Math.sqrt(st.offset ** 2 + (st.gain * codesOf(bits) / 2) ** 2 + L.inlMax ** 2 + 0.25);
+    ro.set('lsb', fmt.si(lsbOf(bits, 2), 'V'));
+    ro.set('dnl', '±' + L.dnlMax.toFixed(2), L.dnlMax > 0.9 ? 'bad' : 'good');
+    ro.set('inl', '±' + L.inlMax.toFixed(2));
+    ro.set('miss', L.missing ? 'yes' : 'no', L.missing ? 'bad' : 'good');
+    ro.set('mono', L.monotonic ? 'yes' : 'no', L.monotonic ? 'good' : 'bad');
+    ro.set('tue', tue.toFixed(2) + ' LSB');
+    setEq('LSB = 2 V / 2^' + hi(bits) + ' = ' + hi(fmt.si(lsbOf(bits, 2), 'V')) + '<br>'
+      + 'DNL(k) = step width / LSB − 1 → worst ' + hi('±' + L.dnlMax.toFixed(2) + ' LSB')
+      + '  ·  INL = Σ DNL → worst ' + hi('±' + L.inlMax.toFixed(2) + ' LSB') + '<br>'
+      + 'TUE ≈ √(offset² + gain² + INL² + ¼) = ' + hi(tue.toFixed(2) + ' LSB')
+      + (L.missing ? '  —  a code is missing (DNL reached −1)' : ''));
+  }
+  segmented(controls, 'Resolution N', [{ label: '3', value: 3 }, { label: '4', value: 4 }, { label: '5', value: 5 }, { label: '6', value: 6 }], 5, v => { st.bits = v; draw(); });
+  slider(controls, 'Offset error', { min: -3, max: 3, step: 0.25, value: 0, fmt: v => v.toFixed(2) + ' LSB', on: v => { st.offset = v; draw(); } });
+  slider(controls, 'Gain error', { min: -0.2, max: 0.2, step: 0.01, value: 0, fmt: v => (v * 100).toFixed(0) + ' %', on: v => { st.gain = v; draw(); } });
+  slider(controls, 'DNL roughness', { min: 0, max: 1.2, step: 0.05, value: 0, sweep: true, fmt: v => v.toFixed(2), on: v => { st.dnlAmp = v; draw(); } });
+  slider(controls, 'INL bow', { min: 0, max: 3, step: 0.1, value: 0, sweep: true, fmt: v => v.toFixed(1) + ' LSB', on: v => { st.inlAmp = v; draw(); } });
+  buttons(controls, [{ label: 'New random part', on: () => { st.seed++; draw(); } },
+    { label: 'Perfect converter', ghost: true, on: () => { st.offset = 0; st.gain = 0; st.dnlAmp = 0; st.inlAmp = 0; show(); } }]);
+  draw();
+}});
+
+lab({ id: 'quantise', part: 'Static (DC)', nav: 'Quantisation & SNR', blurb: 'Where 6.02N + 1.76 dB comes from.', build(main) {
+  const p = panel(main, 'Static accuracy', 'Quantisation error, and the 6 dB per bit rule',
+    'Rounding to the nearest code is never wrong by more than half a step. Because the error is as often up as down, it behaves like a small extra noise — and that is exactly where the ideal SNR formula comes from.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 4, amp: 0.9 };
+  const two = el('div', 'two'); out.appendChild(two);
+  const chT = makeChart(two, 'Input and what the converter writes down', 205);
+  const chE = makeChart(two, 'The rounding error, reading by reading', 205);
+  const ro = readouts(out, [{ key: 'lsb', label: 'one step' }, { key: 'ideal', label: 'ideal SNR = 6.02N + 1.76', cls: 'accent' },
+    { key: 'meas', label: 'SNR measured on this wave' }, { key: 'enob', label: 'effective bits' }]);
+  const setEq = below(p, 'Rounding every shop price to the nearest 10p. Sometimes you gain 5p, sometimes you lose 5p, never more, and across a month it averages out exactly like small random noise.',
+    ['Add one bit and watch the measured SNR climb by about 6 dB.',
+     'Drop the amplitude to 0.1: SINAD falls 20 dB but the effective bits stay put — that is what the back-off correction is for.',
+     'At 12 bits the staircase is invisible and the error looks like pure hiss.']);
+  function draw() {
+    const N = 2048, m = 111, x = capture({ bits: st.bits, N, m, amp: st.amp, seed: 3 });
+    const r = acMetrics(x, m, st.amp), q = lsbOf(st.bits, 2);
+    const show = 256, t = Array.from({ length: show }, (_, i) => i);
+    const clean = t.map(i => st.amp * Math.sin(TWO_PI * m * i / N));
+    chT.draw({ series: [{ xs: t, ys: clean, label: 'input', color: css('--muted'), width: 1.5 }, { xs: t, ys: x.slice(0, show), kind: 'step', label: st.bits + '-bit output' }],
+      ymin: -1.05, ymax: 1.05, xlabel: 'reading n', ylabel: 'V', tipSeries: 1, tip: i => ['reading ' + i, 'in  ' + clean[i].toFixed(4), 'out ' + x[i].toFixed(4)] });
+    chE.draw({ series: [{ xs: t, ys: t.map(i => (clean[i] - x[i]) / q), color: css('--s2'), width: 1.25 }],
+      ymin: -0.7, ymax: 0.7, xlabel: 'reading n', ylabel: 'error (LSB)', tip: (i, s) => ['reading ' + i, s.ys[i].toFixed(3) + ' LSB'] });
+    ro.set('lsb', fmt.si(q, 'V'));
+    ro.set('ideal', fmt.n(idealSnr(st.bits)) + ' dB');
+    ro.set('meas', fmt.n(r.snr) + ' dB', r.snr > idealSnr(st.bits) - 3 ? 'good' : '');
+    ro.set('enob', fmt.n(r.enob, 2) + ' bits');
+    setEq('signal power = (FSR/2)²/2, noise power = LSB²/12<br>'
+      + 'ratio = 1.5 × 2^(2·' + hi(st.bits) + ') → SNR = 6.02 · ' + st.bits + ' + 1.76 = ' + hi(fmt.n(idealSnr(st.bits)) + ' dB') + '<br>'
+      + 'measured here: SNR ' + hi(fmt.n(r.snr) + ' dB') + ', SINAD ' + fmt.n(r.sinad) + ' dB, back-off ' + fmt.n(r.backoff) + ' dB → ENOB ' + hi(fmt.n(r.enob, 2)));
+  }
+  slider(controls, 'Resolution N', { min: 2, max: 12, step: 1, value: 4, sweep: true, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Amplitude, of full scale', { min: 0.05, max: 1, step: 0.05, value: 0.9, fmt: v => v.toFixed(2), on: v => { st.amp = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'noise', part: 'Dynamic (AC)', nav: 'Noise & real bits', blurb: 'Input-referred noise, noise-free and effective resolution.', build(main) {
+  const p = panel(main, 'Dynamic performance', 'Input-referred noise: how many bits are real',
+    'Short the input and take thousands of readings. A perfect converter returns one code every time; a real one returns a spread. The width of that spread decides how many of the advertised bits you can actually trust.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 16, sigma: 2 };
+  const ch = makeChart(out, 'Code histogram with the input shorted', 225);
+  const ro = readouts(out, [{ key: 'sig', label: 'input-referred noise' }, { key: 'nfr', label: 'noise-free bits', cls: 'accent' },
+    { key: 'eff', label: 'effective resolution' }, { key: 'wasted', label: 'bits showing only noise' }]);
+  const chB = makeChart(out, 'Real bits against noise, for four converters', 180);
+  const setEq = below(p, 'A bathroom scale whose last digit will not settle. It may display grams, but if that digit dances across five values you do not have gram resolution — you have something coarser, dressed up.',
+    ['A 24-bit part with 12 LSB of noise gives 17.7 noise-free bits. Six of its bits only ever show noise.',
+     'Halve the noise and you gain exactly one bit. Noise, not resolution, is what you are buying.',
+     'Set the noise below 0.15 LSB and the histogram collapses to a single code: now the resolution is real.']);
+  function draw() {
+    const next = rng(9), span = Math.max(5, Math.ceil(st.sigma * 4)), bins = 2 * span + 1, counts = new Array(bins).fill(0);
+    for (let i = 0; i < 40000; i++) {
+      const c = Math.round(st.sigma * gaussian(next)) + span;
+      if (c >= 0 && c < bins) counts[c]++;
+    }
+    ch.draw({ series: [{ xs: counts.map((_, i) => i - span), ys: counts, kind: 'bar' }],
+      xlabel: 'output code, relative to the mean', ylabel: 'readings',
+      tip: (i, s) => ['code ' + (i - span), s.ys[i].toFixed(0) + ' readings'] });
+    const nfr = noiseFreeBits(st.bits, st.sigma), eff = effResBits(st.bits, st.sigma);
+    ro.set('sig', st.sigma.toFixed(2) + ' LSB rms');
+    ro.set('nfr', fmt.n(nfr, 1) + ' bits', nfr > st.bits - 2 ? 'good' : 'bad');
+    ro.set('eff', fmt.n(eff, 1) + ' bits');
+    ro.set('wasted', fmt.n(Math.max(0, st.bits - nfr), 1) + ' bits');
+    const sig = [0.25, 0.5, 1, 2, 4, 8, 16, 32];
+    chB.draw({ series: [12, 16, 20, 24].map((b, i) => ({ xs: sig.map(Math.log2), ys: sig.map(s => noiseFreeBits(b, s)), label: b + '-bit part', color: css('--s' + (i % 4 + 1)) })),
+      xlabel: 'input-referred noise (LSB rms)', ylabel: 'noise-free bits', xfmt: v => (2 ** v).toString(), ymin: 0, ymax: 24,
+      tip: (i) => ['noise ' + sig[i] + ' LSB'] });
+    setEq('noise-free bits = log₂( 2^' + hi(st.bits) + ' / (6.6 × ' + hi(st.sigma.toFixed(2)) + ') ) = ' + hi(fmt.n(nfr, 1)) + '<br>'
+      + 'effective resolution = log₂( 2ᴺ / σ ) = ' + fmt.n(eff, 1) + ' bits — the rms version, about 2.7 bits more generous<br>'
+      + 'so ' + hi(fmt.n(Math.max(0, st.bits - nfr), 1) + ' of the ' + st.bits + ' bits') + ' only ever show noise');
+  }
+  segmented(controls, 'Advertised resolution', [{ label: '12', value: 12 }, { label: '16', value: 16 }, { label: '20', value: 20 }, { label: '24 bit', value: 24 }], 16, v => { st.bits = v; draw(); });
+  slider(controls, 'Input-referred noise', { min: 0.1, max: 32, step: 0.1, value: 2, sweep: true, fmt: v => v.toFixed(2) + ' LSB', on: v => { st.sigma = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'spectrum', part: 'Dynamic (AC)', nav: 'Spectrum: SNR, THD, SFDR', blurb: 'Every AC figure, measured live from one capture.', build(main) {
+  const p = panel(main, 'Dynamic performance', 'One capture, every AC parameter at once',
+    'This is how every dynamic number on a datasheet is actually measured: apply one pure tone, take an FFT, and read the answers off the spectrum. Add distortion, noise and clock jitter and watch which figure of merit notices.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 12, amp: 0.9, hd2: -70, hd3: -75, jitter: 0, noise: 0, m: 111 };
+  const ch = makeChart(out, 'Spectrum of a single tone (dB relative to full scale)', 250);
+  const ro = readouts(out, [{ key: 'snr', label: 'SNR (harmonics excluded)' }, { key: 'thd', label: 'THD' },
+    { key: 'sinad', label: 'SINAD' }, { key: 'enob', label: 'ENOB', cls: 'accent' },
+    { key: 'sfdr', label: 'SFDR' }, { key: 'floor', label: 'visible FFT floor' }]);
+  const tbl = el('div', 'chart'); out.appendChild(tbl);
+  const setEq = below(p, 'A slightly buzzy loudspeaker. Play one clean note and you also hear faint notes an octave and an octave-and-a-fifth above it, plus a background hiss. THD measures the extra notes, SNR the hiss, SINAD both together.',
+    ['Set HD2 to −50 dBc: SFDR collapses to 50 dB while SNR barely moves. Distortion and noise are separate problems.',
+     'Add 5 ps of jitter and watch the floor lift around the tone rather than across the whole span.',
+     'Raise the bits from 8 to 14 with no distortion: SNR climbs 6 dB per bit, exactly as the formula promises.']);
+  function draw() {
+    const N = 4096;
+    const x = capture({ bits: st.bits, N, m: st.m, amp: st.amp, hd2: st.hd2, hd3: st.hd3, jitter: st.jitter * 1e-12, fs: 1e8, noiseLsb: st.noise, seed: 19 });
+    const r = acMetrics(x, st.m, st.amp);
+    const keep = 1024;
+    ch.draw({ series: [{ xs: Array.from({ length: keep }, (_, i) => i * 100 / N), ys: r.spectrumDb.slice(0, keep), width: 1.25 }],
+      ymin: -140, ymax: 5, xlabel: 'frequency (MHz), sampled at 100 MSPS', ylabel: 'dBFS',
+      tip: (i, s) => ['bin ' + i, s.xs[i].toFixed(2) + ' MHz', s.ys[i].toFixed(1) + ' dB'] });
+    ro.set('snr', fmt.n(r.snr) + ' dB');
+    ro.set('thd', fmt.n(r.thd) + ' dBc');
+    ro.set('sinad', fmt.n(r.sinad) + ' dB');
+    ro.set('enob', fmt.n(r.enob, 2) + ' bits', r.enob > st.bits - 1 ? 'good' : 'bad');
+    ro.set('sfdr', fmt.n(r.sfdr) + ' dBc', r.sfdr > 70 ? 'good' : '');
+    ro.set('floor', fmt.n(-r.snr - 10 * Math.log10(N / 2)) + ' dBFS');
+    tbl.innerHTML = '<div class="t">Harmonics found in this capture</div><div class="tablewrap"><table class="steps">'
+      + '<tr><th>Harmonic</th><th>Bin</th><th>Frequency</th><th>Level</th></tr>'
+      + r.harmonics.map(h => '<tr><td>HD' + h.h + '</td><td class="m">' + h.bin + '</td><td class="m">'
+        + (h.bin * 100 / N).toFixed(2) + ' MHz</td><td class="m">' + h.db.toFixed(1) + ' dBc</td></tr>').join('')
+      + '</table></div>';
+    setEq('SNR ' + hi(fmt.n(r.snr) + ' dB') + '  ·  THD ' + hi(fmt.n(r.thd) + ' dBc') + '  ·  SINAD ' + hi(fmt.n(r.sinad) + ' dB') + '<br>'
+      + 'ENOB = (SINAD − 1.76 + back-off ' + fmt.n(r.backoff, 1) + ') / 6.02 = ' + hi(fmt.n(r.enob, 2) + ' bits')
+      + '  ·  ideal for ' + st.bits + ' bits is ' + fmt.n(idealSnr(st.bits)) + ' dB<br>'
+      + 'SFDR = gap to the tallest spur (bin ' + r.spurBin + ') = ' + hi(fmt.n(r.sfdr) + ' dBc'));
+  }
+  slider(controls, 'Resolution N', { min: 6, max: 16, step: 1, value: 12, sweep: true, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Amplitude, of full scale', { min: 0.05, max: 1, step: 0.05, value: 0.9, fmt: v => v.toFixed(2), on: v => { st.amp = v; draw(); } });
+  slider(controls, 'Second harmonic HD2', { min: -110, max: -30, step: 1, value: -70, sweep: true, fmt: v => v + ' dBc', on: v => { st.hd2 = v; draw(); } });
+  slider(controls, 'Third harmonic HD3', { min: -110, max: -30, step: 1, value: -75, fmt: v => v + ' dBc', on: v => { st.hd3 = v; draw(); } });
+  slider(controls, 'Clock jitter', { min: 0, max: 20, step: 0.5, value: 0, fmt: v => v.toFixed(1) + ' ps', on: v => { st.jitter = v; draw(); } });
+  slider(controls, 'Input-referred noise', { min: 0, max: 8, step: 0.25, value: 0, fmt: v => v.toFixed(2) + ' LSB', on: v => { st.noise = v; draw(); } });
+  buttons(controls, [{ label: 'Clean converter', ghost: true, on: () => { location.hash = '#spectrum'; } }]);
+  draw();
+}});
+
+lab({ id: 'jitter', part: 'Timing', nav: 'Aperture jitter', blurb: 'Why the clock, not the bits, limits fast inputs.', build(main) {
+  const p = panel(main, 'Timing', 'Aperture jitter: the limit that uses input frequency',
+    'The sampling switch never opens at exactly the same instant twice. A fast-moving input travels a long way during that uncertainty, so the frozen value is wrong. Above a certain input frequency the clock, not the converter, sets your accuracy.');
+  const { controls, out } = labLayout(p);
+  const st = { f: 7e7, tj: 1e-12, bits: 12 };
+  const ch = makeChart(out, 'Best achievable SNR against input frequency', 245);
+  const ro = readouts(out, [{ key: 'j', label: 'limit set by jitter' }, { key: 'q', label: 'limit set by your bits' },
+    { key: 'tot', label: 'combined' }, { key: 'enob', label: 'effective bits', cls: 'accent' }, { key: 'need', label: 'jitter you need for all your bits' }]);
+  const setEq = below(p, 'Photographing a sprinter with a shutter that fires a fraction early or late each time. The faster the runner, the more the same timing slip blurs the picture. A stationary subject would not care at all.',
+    ['At 10 MHz with 1 ps, a 12-bit part keeps all its bits. Drag the frequency to 200 MHz and watch them go.',
+     'Ten times the frequency, or ten times the jitter, costs 20 dB — about three and a third bits, every time.',
+     'Ask for 14 bits at 1 GHz and read the jitter you would need: about 30 femtoseconds, clock included.']);
+  function draw() {
+    const fs = linspace(6, 9.3, 200).map(v => 10 ** v);
+    const jl = jitterSnrAdc(st.f, st.tj), ql = idealSnr(st.bits);
+    const tot = -10 * Math.log10(10 ** (-jl / 10) + 10 ** (-ql / 10));
+    ch.draw({ series: [
+      { xs: fs.map(Math.log10), ys: fs.map(f => jitterSnrAdc(f, st.tj)), label: 'jitter limit, ' + fmt.si(st.tj, 's', 2) },
+      { xs: fs.map(Math.log10), ys: fs.map(() => ql), label: st.bits + '-bit quantisation limit', color: css('--s2') },
+      { xs: [Math.log10(st.f)], ys: [Math.min(jl, ql)], kind: 'dots', r: 6, color: css('--s3') }],
+      xmin: 6, xmax: 9.3, xticks: 4, xfmt: v => fmt.si(10 ** v, 'Hz', 2), ymin: 20, ymax: 120, ylabel: 'SNR (dB)',
+      tip: (i, s) => [fmt.si(10 ** s.xs[i], 'Hz', 3), 'jitter limit ' + s.ys[i].toFixed(1) + ' dB'] });
+    ro.set('j', fmt.n(jl) + ' dB');
+    ro.set('q', fmt.n(ql) + ' dB');
+    ro.set('tot', fmt.n(tot) + ' dB');
+    ro.set('enob', fmt.n(enobFromSinad(tot), 1) + ' bits', jl > ql ? 'good' : 'bad');
+    ro.set('need', fmt.si(jitterBudget(st.f, st.bits), 's', 2));
+    setEq('SNR_jitter = −20 log₁₀(2π · ' + hi(fmt.si(st.f, 'Hz')) + ' · ' + hi(fmt.si(st.tj, 's', 2)) + ') = ' + hi(fmt.n(jl) + ' dB') + '<br>'
+      + 'your bits allow ' + fmt.n(ql) + ' dB; the worse of the two wins → ' + hi(fmt.n(enobFromSinad(tot), 1) + ' real bits') + '<br>'
+      + 'to keep all ' + st.bits + ' bits at this frequency you need ' + hi(fmt.si(jitterBudget(st.f, st.bits), 's', 2)) + ' of total jitter');
+  }
+  slider(controls, 'Input frequency', { min: 6, max: 9.3, step: 0.05, value: 7e7, log: true, sweep: true, fmt: v => fmt.si(v, 'Hz', 3), on: v => { st.f = v; draw(); } });
+  slider(controls, 'Clock jitter', { min: -14, max: -10.5, step: 0.05, value: 1e-12, log: true, fmt: v => fmt.si(v, 's', 2), on: v => { st.tj = v; draw(); } });
+  segmented(controls, 'Resolution', [{ label: '8', value: 8 }, { label: '12', value: 12 }, { label: '14', value: 14 }, { label: '16 bit', value: 16 }], 12, v => { st.bits = v; draw(); });
+  draw();
+}});
+
+lab({ id: 'settling', part: 'Timing', nav: 'Acquisition & settling', blurb: 'What the driving amplifier must deliver.', build(main) {
+  const p = panel(main, 'Timing', 'Acquisition and settling: the demand on your amplifier',
+    'During the track phase the hold capacitor must reach the input to within half an LSB. More bits means a tighter target and therefore more time constants — and that is what really decides which amplifier you can put in front of the converter.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 16, fs: 1e6, duty: 0.5 };
+  const ch = makeChart(out, 'Settling error against elapsed time constants', 230);
+  const ro = readouts(out, [{ key: 'taus', label: 'time constants needed' }, { key: 'track', label: 'track time available' },
+    { key: 'tau', label: 'longest time constant allowed', cls: 'accent' }, { key: 'bw', label: 'amplifier bandwidth needed' }, { key: 'pct', label: 'settle to within' }]);
+  const setEq = below(p, 'Filling a measuring jug from a tap. Getting roughly full is quick; getting to the exact line, with the surface completely still, takes several times longer than you expect.',
+    ['Go from 12 to 16 bits: the time constants needed rise from 9.0 to 11.8, so the amplifier must be 30 % faster.',
+     'Raise the sample rate to 10 MSPS at 16 bits and watch the required bandwidth pass 38 MHz.',
+     'Under-settling never looks like a settling problem in the FFT — it looks exactly like distortion.']);
+  function draw() {
+    const taus = settlingTaus(st.bits), track = st.duty / st.fs, tau = track / taus;
+    const t = linspace(0, taus * 1.35, 120);
+    ch.draw({ series: [
+      { xs: t, ys: t.map(v => settleErrorLsb(v, 1, st.bits)), label: 'settling error' },
+      { xs: t, ys: t.map(() => 0.5), label: '½ LSB target', color: css('--s2') }],
+      ymin: 0, ymax: 12, xlabel: 'time constants elapsed', ylabel: 'error (LSB)',
+      tip: (i, s) => [s.xs[i].toFixed(1) + ' τ', s.ys[i].toFixed(2) + ' LSB'] });
+    ro.set('taus', fmt.n(taus, 1) + ' τ');
+    ro.set('track', fmt.si(track, 's', 3));
+    ro.set('tau', fmt.si(tau, 's', 3));
+    ro.set('bw', fmt.si(1 / (TWO_PI * tau), 'Hz', 3));
+    ro.set('pct', (100 / 2 ** (st.bits + 1)).toPrecision(2) + ' %');
+    setEq('time constants = ln(2^(' + hi(st.bits) + '+1)) = ' + hi(fmt.n(taus, 1)) + '<br>'
+      + 'track time = ' + (st.duty * 100).toFixed(0) + ' % of 1/' + fmt.si(st.fs, 'SPS', 3) + ' = ' + hi(fmt.si(track, 's', 3))
+      + ' → τ must be under ' + hi(fmt.si(tau, 's', 3)) + '<br>'
+      + 'amplifier bandwidth = 1/(2πτ) = ' + hi(fmt.si(1 / (TWO_PI * tau), 'Hz', 3)) + ', settling to ' + (100 / 2 ** (st.bits + 1)).toPrecision(2) + ' %');
+  }
+  slider(controls, 'Resolution N', { min: 8, max: 24, step: 1, value: 16, sweep: true, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Sample rate', { min: 3, max: 8, step: 0.05, value: 1e6, log: true, fmt: v => fmt.si(v, 'SPS', 3), on: v => { st.fs = v; draw(); } });
+  slider(controls, 'Fraction of the cycle spent tracking', { min: 0.2, max: 0.8, step: 0.05, value: 0.5, fmt: v => (v * 100).toFixed(0) + ' %', on: v => { st.duty = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'bandwidth', part: 'Bandwidth', nav: 'Bandwidth & Nyquist zones', blurb: 'Where a tone lands, and whether the front end can reach it.', build(main) {
+  const p = panel(main, 'Bandwidth', 'Nyquist zones: where your signal really lands',
+    'Analog bandwidth and sample rate are separate specifications. A converter can faithfully accept a signal far above half its sample rate — and that is what makes deliberate undersampling possible, as long as the clock is clean enough.');
+  const { controls, out } = labLayout(p);
+  const st = { fin: 70, fs: 61.44, bw: 300 };
+  const ch = makeChart(out, 'The input tone and the Nyquist zone boundaries', 230);
+  const ro = readouts(out, [{ key: 'ny', label: 'Nyquist limit, f_s/2' }, { key: 'zone', label: 'Nyquist zone of your tone' },
+    { key: 'lands', label: 'where it appears', cls: 'accent' }, { key: 'rev', label: 'spectrally reversed?' },
+    { key: 'reach', label: 'front end reaches it?' }, { key: 'jit', label: 'jitter budget for 12 bits here' }]);
+  const setEq = below(p, 'Watching a fast fan under a strobe light. Choose the strobe rate well and the blades appear to creep along slowly, perfectly readable. Nothing about the fan changed — you chose a look rate that suits you.',
+    ['The default is a 70 MHz IF sampled at 61.44 MSPS: it lands in zone 3 and folds down to 8.56 MHz.',
+     'Even-numbered zones come back reversed. Odd-numbered zones keep their order.',
+     'Push the input to 400 MHz with 300 MHz of analog bandwidth: the front end can no longer reach it and the plan fails.']);
+  function draw() {
+    const half = st.fs / 2, zone = Math.floor(st.fin / half) + 1;
+    const r = st.fin % st.fs, alias = Math.min(r, st.fs - r), reversed = zone % 2 === 0;
+    const zones = Array.from({ length: 8 }, (_, i) => (i + 1) * half);
+    ch.draw({ series: [
+      { xs: zones, ys: zones.map(() => 2), kind: 'stem', label: 'zone boundaries, every f_s/2', color: css('--line'), width: 1 },
+      { xs: [st.fin, st.fin], ys: [0, 1.55], label: 'your tone, ' + st.fin.toFixed(2) + ' MHz', color: css('--s2'), width: 3 },
+      { xs: [alias, alias], ys: [0, 1.15], label: 'where it appears, ' + alias.toFixed(2) + ' MHz', color: css('--s1'), width: 3 },
+      { xs: [st.fin], ys: [1.55], kind: 'dots', r: 7, color: css('--s2') },
+      { xs: [alias], ys: [1.15], kind: 'dots', r: 7, color: css('--s1') }],
+      xmin: 0, xmax: Math.max(st.fin * 1.15, st.fs * 3.2), ymin: 0, ymax: 2.3,
+      xlabel: 'frequency (MHz) · the tall marks are multiples of f_s/2', yfmt: () => '',
+      tipSeries: 1, tip: () => ['tone ' + st.fin.toFixed(2) + ' MHz', 'zone ' + zone, 'appears at ' + alias.toFixed(2) + ' MHz'] });
+    ro.set('ny', half.toFixed(2) + ' MHz');
+    ro.set('zone', 'zone ' + zone);
+    ro.set('lands', alias.toFixed(2) + ' MHz');
+    ro.set('rev', reversed ? 'yes' : 'no');
+    ro.set('reach', st.bw > st.fin ? 'yes' : 'no', st.bw > st.fin ? 'good' : 'bad');
+    ro.set('jit', fmt.si(jitterBudget(st.fin * 1e6, 12), 's', 2));
+    setEq('f_s/2 = ' + hi(half.toFixed(2) + ' MHz') + '  ·  your tone sits in ' + hi('zone ' + zone) + '<br>'
+      + 'it folds to |f − k·f_s| = ' + hi(alias.toFixed(2) + ' MHz') + (reversed ? ', spectrally reversed (even zone)' : ', in normal order (odd zone)') + '<br>'
+      + 'the jitter budget is set by the real input frequency: ' + hi(fmt.si(jitterBudget(st.fin * 1e6, 12), 's', 2)) + ' for 12 bits');
+  }
+  slider(controls, 'Input frequency', { min: 1, max: 450, step: 0.5, value: 70, sweep: true, fmt: v => v.toFixed(1) + ' MHz', on: v => { st.fin = v; draw(); } });
+  slider(controls, 'Sample rate', { min: 10, max: 200, step: 0.01, value: 61.44, fmt: v => v.toFixed(2) + ' MSPS', on: v => { st.fs = v; draw(); } });
+  slider(controls, 'Analog input bandwidth', { min: 50, max: 1000, step: 10, value: 300, fmt: v => v + ' MHz', on: v => { st.bw = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'oversample', part: 'Bandwidth', nav: 'Oversampling', blurb: 'Trading speed for dynamic range.', build(main) {
+  const p = panel(main, 'Bandwidth', 'Oversampling and noise shaping',
+    'Sampling faster than Nyquist spreads the same fixed quantisation noise across a wider band. A digital filter then keeps only the band you care about and throws the rest away — taking most of the noise with it. Noise shaping pushes even more of it out of the way.');
+  const { controls, out } = labLayout(p);
+  const st = { bits: 12, osr: 16, order: 1, bw: 20e3 };
+  const ch = makeChart(out, 'Dynamic range gained against oversampling ratio', 235);
+  const ro = readouts(out, [{ key: 'base', label: 'plain SNR of the quantiser' }, { key: 'gain', label: 'gained by oversampling', cls: 'accent' },
+    { key: 'total', label: 'dynamic range achieved' }, { key: 'bits', label: 'equivalent bits' }, { key: 'fs', label: 'sample rate this needs' }]);
+  const setEq = below(p, 'Weighing a letter on a coarse scale a thousand times while nudging it, then averaging. Many rough measurements, carefully combined, beat one careful measurement — and cost far less to build.',
+    ['With no shaping, every doubling of the rate buys 3 dB — half a bit. Slow going.',
+     'Switch to second-order shaping: every doubling now buys 15 dB, two and a half bits.',
+     'Set 1 bit with second-order shaping and OSR 128: a one-bit converter reaching over 100 dB. That is a delta-sigma.']);
+  function draw() {
+    const per = st.order === 0 ? 3 : 6 * st.order + 3;
+    const gain = per * Math.log2(st.osr), base = idealSnr(st.bits), total = base + gain;
+    const osrs = [1, 2, 4, 8, 16, 32, 64, 128, 256];
+    ch.draw({ series: [0, 1, 2].map((o, i) => ({
+      xs: osrs.map(Math.log2), ys: osrs.map(v => (o === 0 ? 3 : 6 * o + 3) * Math.log2(v)),
+      label: o === 0 ? 'no shaping (+3 dB)' : o + (o === 1 ? 'st' : 'nd') + '-order (+' + (6 * o + 3) + ' dB)', color: css('--s' + (i + 1)),
+    })).concat([{ xs: [Math.log2(st.osr)], ys: [gain], kind: 'dots', r: 7, color: css('--s4') }]),
+      xlabel: 'oversampling ratio', ylabel: 'dB gained', xfmt: v => (2 ** v).toString(), ymin: 0, ymax: 130,
+      tip: (i) => ['OSR ' + osrs[i]] });
+    ro.set('base', fmt.n(base) + ' dB');
+    ro.set('gain', '+' + fmt.n(gain) + ' dB');
+    ro.set('total', fmt.n(total) + ' dB');
+    ro.set('bits', fmt.n(enobFromSinad(total), 1) + ' bits');
+    ro.set('fs', fmt.si(st.osr * 2 * st.bw, 'SPS', 3));
+    setEq('OSR = ' + hi(st.osr + '×') + ' with ' + (st.order === 0 ? 'no shaping' : st.order + '-order shaping') + ' → ' + per + ' dB per doubling<br>'
+      + 'gain = ' + per + ' × log₂(' + st.osr + ') = ' + hi('+' + fmt.n(gain) + ' dB') + '<br>'
+      + 'dynamic range = ' + fmt.n(base) + ' + ' + fmt.n(gain) + ' = ' + hi(fmt.n(total) + ' dB') + ', equivalent to ' + hi(fmt.n(enobFromSinad(total), 1) + ' bits'));
+  }
+  slider(controls, 'Quantiser resolution', { min: 1, max: 16, step: 1, value: 12, fmt: v => v + ' bit', on: v => { st.bits = v; draw(); } });
+  slider(controls, 'Oversampling ratio', { min: 0, max: 10, step: 1, value: 4, sweep: true, fmt: v => (2 ** v) + '×', on: v => { st.osr = 2 ** v; draw(); } });
+  segmented(controls, 'Noise shaping', [{ label: 'none', value: 0 }, { label: '1st order', value: 1 }, { label: '2nd order', value: 2 }], 1, v => { st.order = v; draw(); });
+  segmented(controls, 'Signal bandwidth', [{ label: '20 kHz', value: 20e3 }, { label: '1 MHz', value: 1e6 }, { label: '20 MHz', value: 2e7 }], 20e3, v => { st.bw = v; draw(); });
+  draw();
+}});
+
+lab({ id: 'fom', part: 'Power', nav: 'Power & figures of merit', blurb: 'Walden and Schreier, on your own numbers.', build(main) {
+  const p = panel(main, 'Power and system', 'Figures of merit: comparing converters fairly',
+    'Power alone tells you nothing — a slow precision part and a fast coarse one are not comparable. The two figures of merit divide out the work being done, so you can put any two converters side by side. Type in a part and see where it lands.');
+  const { controls, out } = labLayout(p);
+  const st = { p: 0.3, enob: 11.5, fs: 1e8, sndr: 70.5 };
+  const ch = makeChart(out, 'Your part against four reference designs (Walden, lower is better)', 225);
+  const ro = readouts(out, [{ key: 'w', label: 'Walden FoM', cls: 'accent' }, { key: 's', label: 'Schreier FoM' },
+    { key: 'e', label: 'energy per conversion' }, { key: 'verdict', label: 'verdict' }]);
+  const setEq = below(p, 'Litres per hundred kilometres for cars. It lets you compare a small hatchback with a lorry, because it divides out how much work each one is actually doing.',
+    ['The default is a 12-bit, 100 MSPS, 300 mW part: about 1 pJ per conversion step.',
+     'Halve the power and the Walden figure halves. Add one effective bit and it halves again.',
+     'Use Walden for fast, coarse parts and Schreier for slow, precise ones — quoting the wrong one flatters the wrong design.']);
+  const REF = [['8b 1 GSPS', 0.5, 7.5, 1e9, 45, 5e8], ['12b 100 MSPS', 0.3, 11.5, 1e8, 70.5, 5e7],
+    ['16b 10 MSPS', 0.12, 14.5, 1e7, 88, 5e6], ['24b 1 kSPS', 0.002, 21, 1e3, 120, 500]];
+  function draw() {
+    const w = waldenFoM(st.p, st.enob, st.fs), bw = st.fs / 2, s = schreierFoM(st.sndr, bw, st.p);
+    const names = REF.map(r => r[0]).concat(['your part']);
+    const vals = REF.map(r => waldenFoM(r[1], r[2], r[3]) * 1e12).concat([w * 1e12]);
+    ch.draw({ series: [{ xs: vals.map((_, i) => i), ys: vals, kind: 'bar' }],
+      xmin: -0.6, xmax: names.length - 0.4, xticks: names.length, xfmt: v => names[Math.round(v)] || '',
+      ylabel: 'pJ per conversion step', tip: i => [names[i], vals[i].toFixed(2) + ' pJ/step'] });
+    ro.set('w', (w * 1e12).toFixed(2) + ' pJ/step', w * 1e12 < 1 ? 'good' : '');
+    ro.set('s', fmt.n(s) + ' dB', s > 160 ? 'good' : '');
+    ro.set('e', fmt.si(st.p / st.fs, 'J', 3));
+    ro.set('verdict', w * 1e12 < 0.1 ? 'state of the art' : w * 1e12 < 1 ? 'strong' : w * 1e12 < 5 ? 'respectable' : 'power hungry');
+    setEq('FoM_W = P / (2^ENOB × f_s) = ' + hi(fmt.si(st.p, 'W', 2)) + ' / (2^' + st.enob + ' × ' + fmt.si(st.fs, 'SPS', 3) + ') = ' + hi((w * 1e12).toFixed(2) + ' pJ/step') + '<br>'
+      + 'FoM_S = SNDR + 10 log₁₀(BW / P) = ' + st.sndr + ' + 10 log₁₀(' + fmt.si(bw, 'Hz', 3) + ' / ' + fmt.si(st.p, 'W', 2) + ') = ' + hi(fmt.n(s) + ' dB') + '<br>'
+      + 'state of the art is a few femtojoules per step, or above about 175 dB');
+  }
+  slider(controls, 'Power dissipation', { min: -4, max: 0.5, step: 0.02, value: 0.3, log: true, fmt: v => fmt.si(v, 'W', 3), on: v => { st.p = v; draw(); } });
+  slider(controls, 'ENOB', { min: 4, max: 22, step: 0.5, value: 11.5, sweep: true, fmt: v => v.toFixed(1) + ' bits', on: v => { st.enob = v; st.sndr = 6.02 * v + 1.76; draw(); } });
+  slider(controls, 'Sample rate', { min: 3, max: 10, step: 0.05, value: 1e8, log: true, fmt: v => fmt.si(v, 'SPS', 3), on: v => { st.fs = v; draw(); } });
+  draw();
+}});
+
+lab({ id: 'arch', part: 'Architectures', nav: 'Which architecture?', blurb: 'Five designs, and what each one trades away.', build(main) {
+  const p = panel(main, 'Architectures', 'Five ways to build the quantiser',
+    'Every architecture does the same job in a different order, and each trades the parameters in this app against each other differently. Pick what your design needs and see which ones survive.');
+  const { controls, out } = labLayout(p);
+  const ARCH = [
+    { n: 'Flash', fs: [1e6, 5e9], bits: [4, 8], lat: '1 cycle', good: 'Fastest possible; one clock per result', bad: '2ᴺ−1 comparators: power and area explode' },
+    { n: 'SAR', fs: [1e3, 1e8], bits: [8, 18], lat: 'N cycles, none after', good: 'Excellent power efficiency; zero latency', bad: 'One result per N clocks' },
+    { n: 'Pipeline', fs: [1e7, 2e9], bits: [10, 16], lat: '8–16 cycles', good: 'Best speed-resolution product', bad: 'Latency; needs calibration' },
+    { n: 'Delta-sigma', fs: [1e3, 1e7], bits: [16, 24], lat: 'long (filter)', good: 'Superb DNL and dynamic range', bad: 'Slow; heavy digital filtering' },
+    { n: 'Dual-slope', fs: [1, 1e3], bits: [12, 22], lat: 'very long', good: 'Rejects mains hum; extremely linear', bad: 'Far too slow for signals' },
+  ];
+  const st = { fs: 1e7, bits: 12, lowLatency: false };
+  const tbl = el('div', 'chart'); out.appendChild(tbl);
+  const ch = makeChart(out, 'Where each architecture lives', 235);
+  const setEq = below(p, 'Choosing a vehicle. A motorbike, a saloon and a lorry all move things, and asking which is "best" is meaningless until you say how much, how fast, and how far.',
+    ['Ask for 100 MSPS at 12 bits: pipeline and fast SAR survive, everything else drops out.',
+     'Ask for 24 bits at 1 kSPS: only delta-sigma and dual-slope remain.',
+     'Tick "must have zero latency" and pipeline disappears — that is the trade it makes for its speed.']);
+  function draw() {
+    const ok = a => st.fs >= a.fs[0] && st.fs <= a.fs[1] && st.bits >= a.bits[0] && st.bits <= a.bits[1]
+      && (!st.lowLatency || a.lat.indexOf('none') >= 0 || a.lat === '1 cycle');
+    tbl.innerHTML = '<div class="t">Architectures that meet your requirement</div><div class="tablewrap"><table class="steps">'
+      + '<tr><th>Architecture</th><th>Fits?</th><th>Latency</th><th>Strength</th><th>Weakness</th></tr>'
+      + ARCH.map(a => '<tr' + (ok(a) ? ' class="now"' : ' style="opacity:.4"') + '><td><b>' + a.n + '</b></td><td>'
+        + (ok(a) ? 'yes' : 'no') + '</td><td>' + a.lat + '</td><td>' + a.good + '</td><td>' + a.bad + '</td></tr>').join('')
+      + '</table></div>';
+    ch.draw({ series: ARCH.map((a, i) => ({
+        xs: [Math.log10(a.fs[0]), Math.log10(a.fs[1])], ys: [a.bits[0], a.bits[1]],
+        label: a.n, color: ok(a) ? css('--s' + (i % 4 + 1)) : css('--line'), width: ok(a) ? 7 : 3,
+      })).concat([{ xs: [Math.log10(st.fs)], ys: [st.bits], kind: 'dots', r: 8, color: css('--s2'), label: 'your requirement' }]),
+      xmin: 0, xmax: 9.5, ymin: 2, ymax: 26, xticks: 5, xfmt: v => fmt.si(10 ** v, 'SPS', 2),
+      xlabel: 'sample rate', ylabel: 'resolution (bits)', tip: () => ['your requirement', fmt.si(st.fs, 'SPS', 3), st.bits + ' bits'] });
+    setEq('you asked for ' + hi(fmt.si(st.fs, 'SPS', 3)) + ' at ' + hi(st.bits + ' bits')
+      + (st.lowLatency ? ' with zero latency' : '') + '<br>'
+      + 'architectures that fit: ' + hi(ARCH.filter(ok).map(a => a.n).join(', ') || 'none — relax a requirement'));
+  }
+  slider(controls, 'Sample rate needed', { min: 0, max: 9.5, step: 0.1, value: 1e7, log: true, sweep: true, fmt: v => fmt.si(v, 'SPS', 3), on: v => { st.fs = v; draw(); } });
+  slider(controls, 'Resolution needed', { min: 4, max: 24, step: 1, value: 12, fmt: v => v + ' bits', on: v => { st.bits = v; draw(); } });
+  segmented(controls, 'Latency', [{ label: 'any', value: false }, { label: 'must be zero', value: true }], false, v => { st.lowLatency = v; draw(); });
+  draw();
+}});
+
+lab({ id: 'reference', part: 'Reference', nav: 'Every parameter', blurb: 'All ' + PARAMS.length + ' parameters, searchable.', build(main) {
+  const p = panel(main, 'Reference', 'Every parameter, in one searchable table',
+    'All ' + PARAMS.length + ' parameters an ADC datasheet can quote, with the symbol, the unit, a plain definition and why it matters. Filter by family or type to search.');
+  const bar = el('div', 'controls'); bar.style.position = 'static';
+  bar.appendChild(el('h3', null, 'Filter'));
+  const search = document.createElement('input');
+  search.type = 'search'; search.placeholder = 'Type to search, e.g. jitter, INL, dBc…';
+  search.setAttribute('aria-label', 'Search parameters');
+  search.style.cssText = 'width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font:inherit';
+  bar.appendChild(search);
+  let fam = 'all';
+  segmented(bar, 'Family', [{ label: 'All', value: 'all' }].concat(Object.keys(FAMILY_NAME).map(k => ({ label: FAMILY_NAME[k], value: k }))), 'all', v => { fam = v; render(); });
+  p.appendChild(bar);
+  const host = el('div', 'chart'); host.style.marginTop = '14px'; p.appendChild(host);
+  function render() {
+    const q = search.value.trim().toLowerCase();
+    const rows = PARAMS.filter(r => (fam === 'all' || r[0] === fam)
+      && (!q || (r[1] + ' ' + r[2] + ' ' + r[3] + ' ' + r[4] + ' ' + r[5]).toLowerCase().indexOf(q) >= 0));
+    host.innerHTML = '<div class="t">' + rows.length + ' of ' + PARAMS.length + ' parameters</div><div class="tablewrap"><table class="steps">'
+      + '<tr><th>Parameter</th><th>Symbol</th><th>Unit</th><th>What it means</th><th>Why it matters</th></tr>'
+      + (rows.length ? rows.map(r => '<tr><td><b>' + r[1] + '</b><br><span style="color:var(--muted);font-size:11px">'
+        + FAMILY_NAME[r[0]] + '</span></td><td class="m">' + r[2] + '</td><td class="m">' + r[3] + '</td><td>' + r[4] + '</td><td>' + r[5] + '</td></tr>').join('')
+        : '<tr><td colspan="5" style="color:var(--muted)">Nothing matches that search.</td></tr>')
+      + '</table></div>';
+  }
+  search.addEventListener('input', render);
+  render();
+}});
+
+lab({ id: 'quiz', part: 'Check yourself', nav: 'Quiz', blurb: 'Eight questions on the parameters.', build(main) {
+  const p = panel(main, 'Check yourself', 'Eight questions',
+    'Pick an answer and the reason appears straight away, with a link to the lab where you can watch it happen.');
+  const Q = [
+    ['A 12-bit converter over a 2 V range. How big is one LSB?', ['488 µV', '244 µV', '1.22 mV'], 0, '2 V ÷ 4096 = 488 µV. Every other parameter is quoted in these units.', 'transfer'],
+    ['DNL reaches −1 LSB at one code. What has happened?', ['The converter is non-monotonic', 'That code can never appear', 'Gain error has doubled'], 1, 'A step squeezed to zero width is a missing code. Non-monotonicity needs DNL below −1.', 'transfer'],
+    ['Which parameter sets the distortion floor, and so caps SFDR?', ['DNL', 'INL', 'Offset error'], 1, 'INL is the smooth bow in the curve, and a smooth nonlinearity is exactly what makes harmonics.', 'transfer'],
+    ['SNR is 72 dB and THD is −76 dBc. What is SINAD?', ['76 dB', '70.5 dB', '74 dB'], 1, 'Powers add: −10 log₁₀(10^−7.2 + 10^−7.6) = 70.5 dB. SINAD is always the smallest of the three.', 'spectrum'],
+    ['A "14-bit" part measures SINAD of 68 dB at full scale. Its ENOB is…', ['14 bits', '11.0 bits', '12.5 bits'], 1, '(68 − 1.76) / 6.02 = 11.0 bits. Three of the fourteen are not there at that frequency.', 'spectrum'],
+    ['Aperture jitter limits SNR using which frequency?', ['The sample rate', 'The input frequency', 'The Nyquist frequency'], 1, 'SNR = −20 log₁₀(2π f_in t_j). This is why undersampling a high IF is so demanding.', 'jitter'],
+    ['Settling to within half an LSB at 16 bits takes about how many time constants?', ['5.5', '11.8', '16'], 1, 'ln(2^17) = 11.8. That is what decides which amplifier can drive the converter.', 'settling'],
+    ['You double the FFT length. The noise floor on the plot drops 3 dB. The converter has…', ['Improved by 3 dB', 'Not changed at all', 'Got 3 dB worse'], 1, 'Processing gain is 10 log₁₀(N/2). The same noise is just spread over twice as many bins.', 'spectrum'],
+  ];
+  let score = 0, done = 0;
+  const card = el('div', 'chart', '<div class="t">Score</div><span class="mono" style="font-size:19px">0 of 8</span>');
+  p.appendChild(card);
+  const wrap = el('div'); p.appendChild(wrap);
+  Q.forEach((q, qi) => {
+    const [text, opts, right, why, link] = q;
+    const box = el('div', 'q');
+    box.appendChild(el('p', null, (qi + 1) + '. ' + text));
+    const o = el('div', 'opts'), whyEl = el('div', 'why');
+    let answered = false;
+    const btns = opts.map((t, i) => {
+      const b = el('button', null, t);
+      b.addEventListener('click', () => {
+        if (answered) return;
+        answered = true; done++;
+        btns.forEach(x => { x.disabled = true; });
+        if (i === right) { score++; b.classList.add('right'); } else { b.classList.add('wrong'); btns[right].classList.add('right'); }
+        whyEl.innerHTML = why + ' <a href="#' + link + '">Open that lab →</a>';
+        card.querySelector('span').textContent = score + ' of 8'
+          + (done === 8 ? (score >= 7 ? '  ·  excellent' : score >= 5 ? '  ·  solid' : '  ·  worth another pass') : '');
+      });
+      o.appendChild(b); return b;
+    });
+    box.append(o, whyEl); wrap.appendChild(box);
+  });
+}});
+
+/* ===================== interface themes ===================== */
+const THEMES = [
+  { id: 'lab', name: 'Instrument lab', bg: '#eef2f7', ac: '#0e7c76',
+    note: 'Calibration blue on paper. The only theme that follows your device\u2019s light or dark setting.' },
+  { id: 'benchtop', name: 'Benchtop', bg: '#0a0f0e', ac: '#2fbf8f',
+    note: 'The front panel of a rack instrument: square corners, dense rows, phosphor green.' },
+  { id: 'studio', name: 'Studio', bg: '#161519', ac: '#e3d8c6',
+    note: 'Bone and charcoal chrome with generous spacing, so the only colour on screen is your data.' },
+  { id: 'blueprint', name: 'Blueprint', bg: '#082036', ac: '#4fb0e0',
+    note: 'A drawing sheet: navy ground, a real grid behind the page, condensed drafting labels.' },
+  { id: 'daylight', name: 'Daylight', bg: '#f1f6f8', ac: '#0b7285',
+    note: 'Biggest type, roundest corners, most air. The easiest one to read from the back of a room.' },
+  { id: 'chalkboard', name: 'Chalkboard', bg: '#22302a', ac: '#f0d264',
+    note: 'The lecture-room look: green board, chalk yellow, handwritten headings.' },
+];
+const root = document.documentElement;
+const themesEl = document.getElementById('themes'), noteEl = document.getElementById('themeNote');
+let themeId = 'lab';
+try { const saved = localStorage.getItem('rfLabTheme'); if (saved && THEMES.some(t => t.id === saved)) themeId = saved; } catch (e) { /* private mode */ }
+
+function applyTheme(id) {
+  themeId = id;
+  if (id === 'lab') root.removeAttribute('data-ui'); else root.setAttribute('data-ui', id);
+  try { localStorage.setItem('rfLabTheme', id); } catch (e) { /* private mode */ }
+  const t = THEMES.find(x => x.id === id);
+  noteEl.textContent = t.name + '. ' + t.note;
+  themesEl.querySelectorAll('button').forEach(b => {
+    const on = b.dataset.id === id;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+THEMES.forEach(t => {
+  const b = el('button', '', '<i style="background:' + t.ac + '"></i>');
+  b.type = 'button'; b.dataset.id = t.id; b.title = t.name;
+  b.setAttribute('aria-label', 'Theme: ' + t.name);
+  b.style.background = t.bg;
+  b.addEventListener('click', () => applyTheme(t.id));
+  themesEl.appendChild(b);
+});
+applyTheme(themeId);
+
+/* ===================== presentation mode ===================== */
+const exitBtn = document.getElementById('exitp');
+function setPresent(on) {
+  if (on) root.setAttribute('data-present', ''); else root.removeAttribute('data-present');
+  repaintAll();
+}
+exitBtn.addEventListener('click', () => setPresent(false));
+
+/* ===================== navigation ===================== */
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+let part = null, idx = 0;
+LABS.forEach(l => {
+  if (l.part !== part) { part = l.part; nav.appendChild(el('div', 'nav-part', part)); }
+  const a = el('a', null, '<span class="n">' + (l.id === 'home' ? '⌂' : ++idx) + '</span><span>' + l.nav + '</span>');
+  a.href = '#' + l.id; a.dataset.id = l.id; nav.appendChild(a);
+});
+document.getElementById('hints').innerHTML =
+  '<span class="kbd">\u2190</span> <span class="kbd">\u2192</span> move between labs<br>'
+  + '<span class="kbd">T</span> next theme &nbsp; <span class="kbd">P</span> presentation mode';
+
+function show() {
+  const id = (location.hash || '#home').slice(1);
+  const i = Math.max(0, LABS.findIndex(x => x.id === id));
+  const l = LABS[i];
+  sweepTimers.forEach(clearInterval); sweepTimers = [];
+  charts = [];
+  main.innerHTML = '';
+  l.build(main);
+  const bar = el('div', 'labnav');
+  const prev = LABS[i - 1], next = LABS[i + 1];
+  bar.appendChild(prev ? Object.assign(el('a', null, '\u2190 ' + prev.nav), { href: '#' + prev.id })
+                       : el('a', 'spacer', '\u2190'));
+  bar.appendChild(next ? Object.assign(el('a', null, next.nav + ' \u2192'), { href: '#' + next.id })
+                       : el('a', 'spacer', '\u2192'));
+  main.appendChild(bar);
+  nav.querySelectorAll('a').forEach(a => a.classList.toggle('active', a.dataset.id === l.id));
+  window.scrollTo(0, 0);
+}
+function step(d) {
+  const id = (location.hash || '#home').slice(1);
+  const i = Math.max(0, LABS.findIndex(x => x.id === id));
+  const t = LABS[i + d];
+  if (t) location.hash = '#' + t.id;
+}
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (e.key === 'ArrowRight') { step(1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { step(-1); e.preventDefault(); }
+  else if (e.key === 't' || e.key === 'T') {
+    applyTheme(THEMES[(THEMES.findIndex(x => x.id === themeId) + 1) % THEMES.length].id);
+  } else if (e.key === 'p' || e.key === 'P') {
+    setPresent(!root.hasAttribute('data-present'));
+  } else if (e.key === 'Escape') {
+    setPresent(false);
+  }
+});
+window.addEventListener('hashchange', show);
+show();
+})();
+</script>
+
+</body>
+</html>
